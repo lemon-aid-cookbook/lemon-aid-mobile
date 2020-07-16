@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Lemon-aid</string>
+    <string name="appCenterCrashes_whenToSendCrashes" moduleConfig="true" translatable="false">DO_NOT_ASK_JAVASCRIPT</string>
+    <string name="appCenterAnalytics_whenToEnableAnalytics" moduleConfig="true" translatable="false">ALWAYS_SEND</string>
+    <!-- Staging -->
+    <string moduleConfig="true" name="CodePushDeploymentKey">8ySiAimU9j2hh3pYyMjBZPvLb9rgkET0IoPGN</string>
+    <!-- Production -->
+    <!-- <string moduleConfig="true" name="CodePushDeploymentKey">RgrlL_poHWxXyXFOLaRc1VM7z5PZ0o9NHxX5m</string> -->
+</resources>
