@@ -28,50 +28,52 @@ class Header extends React.Component<Props, {}> {
   };
 
   render() {
-    <View style={styles.background}>
-      <StatusBar translucent={true} backgroundColor="transparent" />
-      <View style={styles.headerWrap}>
-        {this.props.isShowLeft ? (
-          <TouchableOpacity
-            style={styles.iconContainer}
-            onPress={this.props.onLeftPress}>
-            <Feather
-              name={'chevron-left'}
-              color={COLOR.WHITE}
-              size={24 * ratio}
-            />
-          </TouchableOpacity>
-        ) : (
-          <View style={styles.iconContainer} />
-        )}
-        <View style={styles.titleContainer}>
-          <CText
-            bold
-            style={
-              this.props.type === HEADER_TYPE.MAIN
-                ? {fontFamily: 'Pacifico-Regular'}
-                : {}
-            }
-            color="white"
-            fontSize={this.props.smallTitle ? 20 * ratio : 28 * ratio}>
-            {this.props.headerTitle}
-          </CText>
+    return (
+      <View style={styles.background}>
+        <StatusBar translucent={true} backgroundColor="transparent" />
+        <View style={styles.headerWrap}>
+          {this.props.isShowLeft ? (
+            <TouchableOpacity
+              style={styles.iconContainer}
+              onPress={this.props.onLeftPress}>
+              <Feather
+                name={'chevron-left'}
+                color={COLOR.WHITE}
+                size={24 * ratio}
+              />
+            </TouchableOpacity>
+          ) : (
+            <View style={styles.iconContainer} />
+          )}
+          <View style={styles.titleContainer}>
+            <CText
+              bold
+              style={
+                this.props.type === HEADER_TYPE.MAIN
+                  ? {fontFamily: 'Pacifico-Regular'}
+                  : {}
+              }
+              color="white"
+              fontSize={this.props.smallTitle ? 20 * ratio : 28 * ratio}>
+              {this.props.headerTitle}
+            </CText>
+          </View>
+          {this.props.isShowRight ? (
+            <TouchableOpacity
+              style={styles.iconContainer}
+              onPress={this.props.onRightPress}>
+              <Feather
+                name={this.props.rightIcon}
+                color={COLOR.WHITE}
+                size={24 * ratio}
+              />
+            </TouchableOpacity>
+          ) : (
+            <View style={styles.iconContainer} />
+          )}
         </View>
-        {this.props.isShowRight ? (
-          <TouchableOpacity
-            style={styles.iconContainer}
-            onPress={this.props.onRightPress}>
-            <Feather
-              name={this.props.rightIcon}
-              color={COLOR.WHITE}
-              size={24 * ratio}
-            />
-          </TouchableOpacity>
-        ) : (
-          <View style={styles.iconContainer} />
-        )}
       </View>
-    </View>;
+    );
   }
 }
 
@@ -84,11 +86,13 @@ const styles = StyleSheet.create({
   headerWrap: {
     width: '100%',
     flexDirection: 'row',
-    height: isIphoneX() ? 84 : 60,
-    marginTop: isIphoneX() ? 24 : 0,
+    height: isIphoneX() ? 168 * ratio : 88 * ratio,
+    paddingTop: isIphoneX() ? 60 : 0,
+    paddingBottom: 8 * ratio,
     paddingHorizontal: 16 * ratioW,
-    alignItems: 'center',
+    alignItems: 'flex-end',
     justifyContent: 'space-between',
+    backgroundColor: COLOR.PRIMARY_ACTIVE,
   },
   iconContainer: {
     flex: 0.1,

@@ -5,6 +5,11 @@ export const HEADER_TYPE = {
   MAIN: 'MAIN',
 };
 
+export const MODAL_TYPE = {
+  NORMAL: 'NORMAL',
+  CHOICE: 'CHOICE',
+};
+
 export const COLOR = {
   PRIMARY_ACTIVE: '#6A961F',
   PRIMARY_YELLOW: '#EEC824',

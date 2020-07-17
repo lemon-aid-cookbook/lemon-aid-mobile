@@ -4,6 +4,7 @@ import Dropdown from './Dropdown';
 import {GlobalLoading, GlobalLoadingSetup} from './GlobalLoading/';
 import Check from './Check';
 import CInput from './TextInput';
+import CButton from './Button'
 import {GlobalModal, GlobalModalSetup} from './GlobalModal';
 export {
   CHeader,
@@ -15,4 +16,5 @@ export {
   CInput,
   GlobalModal,
   GlobalModalSetup,
+  CButton
 };
