@@ -3,12 +3,14 @@ import SplashScreen from 'pages/Splash';
 import {createAppContainer, createSwitchNavigator} from 'react-navigation';
 import {createStackNavigator} from 'react-navigation-stack';
 import {createBottomTabNavigator} from 'react-navigation-tabs';
-import {COLOR} from 'config/themeUtils';
+import {COLOR, ratio} from 'config/themeUtils';
 import Feather from 'react-native-vector-icons/Feather';
 import LoginPage from 'pages/Login';
 import SearchPage from 'pages/Search';
 import CameraPage from 'pages/Camera';
 import FavoritePage from 'pages/Favorite';
+import SignUpPage from 'pages/SignUp';
+import ForgotPasswordPage from 'pages/Login/components/forgotPassword.page';
 
 const CameraStack = createStackNavigator(
   {
@@ -19,7 +21,7 @@ const CameraStack = createStackNavigator(
     initialRouteName: 'Camera',
     navigationOptions: {
       tabBarIcon: ({tintColor}) => (
-        <Feather name="camera" size={20} color={tintColor} />
+        <Feather name="camera" size={24 * ratio} color={tintColor} />
       ),
     },
   },
@@ -34,7 +36,7 @@ const FavoriteStack = createStackNavigator(
     initialRouteName: 'Favorite',
     navigationOptions: {
       tabBarIcon: ({tintColor}) => (
-        <Feather name="heart" size={20} color={tintColor} />
+        <Feather name="heart" size={24 * ratio} color={tintColor} />
       ),
     },
   },
@@ -49,7 +51,7 @@ const SearchStack = createStackNavigator(
     initialRouteName: 'Search',
     navigationOptions: {
       tabBarIcon: ({tintColor}) => (
-        <Feather name="search" size={20} color={tintColor} />
+        <Feather name="search" size={24 * ratio} color={tintColor} />
       ),
     },
   },
@@ -58,7 +60,7 @@ const SearchStack = createStackNavigator(
 const LoginStack = createStackNavigator(
   {
     LoginPage: {screen: LoginPage},
-    // ForgotPassword: ForgotPasswordPage,
+    ForgotPassword: {screen: ForgotPasswordPage},
   },
   {
     headerMode: 'none',
@@ -83,14 +85,14 @@ const ProfileSwitch = createSwitchNavigator(
   {
     // Loading: LoadingPage,
     Login: LoginStack,
-    // SignUp: SignUpPage,
+    SignUp: SignUpPage,
     // ProfileStack: ProfileStack,
   },
   {
     headerMode: 'none',
     navigationOptions: {
       tabBarIcon: ({tintColor}) => (
-        <Feather name="user" size={20} color={tintColor} />
+        <Feather name="user" size={24 * ratio} color={tintColor} />
       ),
     },
     initialRouteName: 'Login',
