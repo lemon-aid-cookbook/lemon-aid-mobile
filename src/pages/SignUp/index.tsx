@@ -1,7 +1,7 @@
-import {CButton, CText} from 'components';
+import {AnimatedInput, CButton, CText} from 'components';
 import {COLOR, ratio} from 'config/themeUtils';
 import {Formik} from 'formik';
-import {Form, Input, Item, Label} from 'native-base';
+import {SignupRequest} from 'pages/Login/redux/actions';
 import React from 'react';
 import {
   Image,
@@ -14,7 +14,6 @@ import {
 import {useNavigation} from 'react-navigation-hooks';
 import {useDispatch} from 'react-redux';
 import * as yup from 'yup';
-import {SignupRequest} from 'pages/Login/redux/actions';
 
 export interface Props {}
 
@@ -33,10 +32,7 @@ const validationSchema = yup.object().shape({
     }),
   confirmPassword: yup
     .string()
-    .required('* Vui lòng nhập mật khẩu')
-    .matches(/(?=.{8,})/, {
-      message: 'Mật khẩu phải gồm 8 kí tự',
-    })
+    .required('* Vui lòng nhập lại mật khẩu')
     .oneOf(
       [yup.ref('password'), null],
       'Mật khẩu nhập lại phải khớp với mật khẩu đã nhập',
@@ -51,13 +47,7 @@ const validationSchema = yup.object().shape({
         message: 'Họ tên không hợp lệ',
       },
     ),
-  // username: yup
-  //   .string()
-  //   .trim()
-  //   .required('* Vui lòng nhập họ và tên')
-  //   .matches(/[^a-z0-9A-Z]/u, {
-  //     message: 'Tên đăng nhập không hợp lệ',
-  //   }),
+  username: yup.string().trim().required('* Vui lòng nhập tên đăng nhập'),
 });
 
 const SignUpPage: React.FC<Props> = (props) => {
@@ -66,7 +56,7 @@ const SignUpPage: React.FC<Props> = (props) => {
 
   let inputs = {};
   const focusTheField = (id) => {
-    inputs[id]._root.focus();
+    inputs[id].focus();
   };
 
   return (
@@ -100,137 +90,88 @@ const SignUpPage: React.FC<Props> = (props) => {
             setFieldTouched,
           }) => {
             return (
-              <View style={{marginTop: 28 * ratio}}>
-                <Form style={{marginRight: 16 * ratio}}>
-                  <Item floatingLabel>
-                    <Label style={styles.input}>Tên</Label>
-                    <Input
-                      placeholder="Tên"
-                      style={styles.input}
-                      onTouchStart={() => setFieldTouched('name')}
-                      onChangeText={handleChange('name')}
-                      onBlur={handleBlur('name')}
-                      value={values.name}
-                      blurOnSubmit={false}
-                      returnKeyType={'next'}
-                      onSubmitEditing={() => {
-                        focusTheField('username');
-                      }}
-                    />
-                  </Item>
-                  {touched.name && errors.name && (
-                    <CText
-                      color="red"
-                      fontSize={12 * ratio}
-                      style={styles.errorText}>
-                      {errors.name}
-                    </CText>
-                  )}
-                  <Item floatingLabel>
-                    <Label style={styles.input}>Tên đăng nhập</Label>
-                    <Input
-                      placeholder="Tên đăng nhập"
-                      style={styles.input}
-                      onTouchStart={() => setFieldTouched('username')}
-                      onChangeText={handleChange('username')}
-                      onBlur={handleBlur('username')}
-                      value={values.username}
-                      blurOnSubmit={false}
-                      returnKeyType={'next'}
-                      onSubmitEditing={() => {
-                        focusTheField('email');
-                      }}
-                      getRef={(input) => {
-                        inputs['username'] = input;
-                      }}
-                    />
-                  </Item>
-                  {touched.username && errors.username && (
-                    <CText
-                      color="red"
-                      fontSize={12 * ratio}
-                      style={styles.errorText}>
-                      {errors.username}
-                    </CText>
-                  )}
-                  <Item floatingLabel>
-                    <Label style={styles.input}>Email</Label>
-                    <Input
-                      placeholder="Email"
-                      style={styles.input}
-                      onTouchStart={() => setFieldTouched('email')}
-                      onChangeText={handleChange('email')}
-                      onBlur={handleBlur('email')}
-                      value={values.email}
-                      blurOnSubmit={false}
-                      returnKeyType={'next'}
-                      onSubmitEditing={() => {
-                        focusTheField('password');
-                      }}
-                      getRef={(input) => {
-                        inputs['email'] = input;
-                      }}
-                    />
-                  </Item>
-                  {touched.email && errors.email && (
-                    <CText
-                      color="red"
-                      fontSize={12 * ratio}
-                      style={styles.errorText}>
-                      {errors.email}
-                    </CText>
-                  )}
-                  <Item floatingLabel>
-                    <Label style={styles.input}>Mật khẩu</Label>
-                    <Input
-                      secureTextEntry={true}
-                      placeholder="Mật khẩu"
-                      style={styles.input}
-                      onTouchStart={() => setFieldTouched('password')}
-                      onChangeText={handleChange('password')}
-                      onBlur={handleBlur('password')}
-                      value={values.password}
-                      returnKeyType={'next'}
-                      onSubmitEditing={() => {
-                        focusTheField('confirmPassword');
-                      }}
-                      getRef={(input) => {
-                        inputs['password'] = input;
-                      }}
-                    />
-                  </Item>
-                  {touched.password && errors.password && (
-                    <CText
-                      color="red"
-                      fontSize={12 * ratio}
-                      style={styles.errorText}>
-                      {errors.password}
-                    </CText>
-                  )}
-                  <Item floatingLabel>
-                    <Label style={styles.input}>Nhập lại mật khẩu</Label>
-                    <Input
-                      secureTextEntry={true}
-                      placeholder="Nhập lại mật khẩu"
-                      style={styles.input}
-                      onTouchStart={() => setFieldTouched('confirmPassword')}
-                      onChangeText={handleChange('confirmPassword')}
-                      onBlur={handleBlur('confirmPassword')}
-                      value={values.confirmPassword}
-                      getRef={(input) => {
-                        inputs['confirmPassword'] = input;
-                      }}
-                    />
-                  </Item>
-                  {touched.confirmPassword && errors.confirmPassword && (
-                    <CText
-                      color="red"
-                      fontSize={12 * ratio}
-                      style={styles.errorText}>
-                      {errors.confirmPassword}
-                    </CText>
-                  )}
-                </Form>
+              <View
+                style={{marginTop: 28 * ratio, marginHorizontal: 16 * ratio}}>
+                <AnimatedInput
+                  placeholder="Tên"
+                  onTouchStart={() => setFieldTouched('name')}
+                  onChangeText={handleChange('name')}
+                  onBlur={handleBlur('name')}
+                  value={values.name}
+                  returnKeyType={'next'}
+                  onSubmitEditing={() => {
+                    focusTheField('username');
+                  }}
+                  textError={errors.name}
+                  textSize={16}
+                />
+                <AnimatedInput
+                  placeholder="Tên đăng nhập"
+                  style={styles.input}
+                  onTouchStart={() => setFieldTouched('username')}
+                  onChangeText={handleChange('username')}
+                  onBlur={handleBlur('username')}
+                  value={values.username}
+                  returnKeyType={'next'}
+                  onSubmitEditing={() => {
+                    focusTheField('email');
+                  }}
+                  getRef={(input) => {
+                    inputs['username'] = input;
+                  }}
+                  textError={errors.username}
+                  textSize={16}
+                />
+                <AnimatedInput
+                  placeholder="Email"
+                  style={styles.input}
+                  onTouchStart={() => setFieldTouched('email')}
+                  onChangeText={handleChange('email')}
+                  onBlur={handleBlur('email')}
+                  value={values.email}
+                  returnKeyType={'next'}
+                  onSubmitEditing={() => {
+                    focusTheField('password');
+                  }}
+                  getRef={(input) => {
+                    inputs['email'] = input;
+                  }}
+                  textError={errors.email}
+                  textSize={16}
+                  keyboardType="email-address"
+                />
+                <AnimatedInput
+                  secureTextEntry={true}
+                  placeholder="Mật khẩu"
+                  style={styles.input}
+                  onTouchStart={() => setFieldTouched('password')}
+                  onChangeText={handleChange('password')}
+                  onBlur={handleBlur('password')}
+                  value={values.password}
+                  returnKeyType={'next'}
+                  onSubmitEditing={() => {
+                    focusTheField('confirmPassword');
+                  }}
+                  getRef={(input) => {
+                    inputs['password'] = input;
+                  }}
+                  textError={errors.password}
+                  textSize={16}
+                />
+                <AnimatedInput
+                  secureTextEntry={true}
+                  placeholder="Nhập lại mật khẩu"
+                  style={styles.input}
+                  onTouchStart={() => setFieldTouched('confirmPassword')}
+                  onChangeText={handleChange('confirmPassword')}
+                  onBlur={handleBlur('confirmPassword')}
+                  value={values.confirmPassword}
+                  getRef={(input) => {
+                    inputs['confirmPassword'] = input;
+                  }}
+                  textError={errors.confirmPassword}
+                  textSize={16}
+                />
                 <View style={styles.bottomWrap}>
                   <View style={{flexDirection: 'row'}}>
                     <CText fontSize={14 * ratio}>Đã có tài khoản?</CText>
@@ -281,15 +222,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
   },
   input: {
-    fontFamily: 'Cabin-Regular',
-    fontSize: 16 * ratio,
-    color: 'black',
-    height: 64 * ratio,
-    borderRadius: 4 * ratio,
-  },
-  errorText: {
-    marginLeft: 16,
-    marginTop: 8 * ratio,
+    marginTop: 16 * ratio,
   },
   btnStyle: {
     backgroundColor: COLOR.PRIMARY_ACTIVE,
@@ -302,7 +235,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginVertical: 50 * ratio,
-    marginHorizontal: 16 * ratio,
   },
   bottomWrap: {
     flex: 1,
@@ -310,7 +242,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     marginTop: 16 * ratio,
-    marginHorizontal: 16 * ratio,
     alignSelf: 'flex-end',
   },
   bottomTxt: {

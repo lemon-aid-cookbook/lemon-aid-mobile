@@ -1,3 +1,4 @@
 export interface AuthState {
-  jwt: any;
+  token: any;
+  user: any;
 }

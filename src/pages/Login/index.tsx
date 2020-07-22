@@ -1,7 +1,6 @@
-import {CText, CButton} from 'components';
+import {AnimatedInput, CButton, CText} from 'components';
 import {COLOR, ratio} from 'config/themeUtils';
 import {Formik} from 'formik';
-import {Form, Input, Item, Label} from 'native-base';
 import React from 'react';
 import {
   Image,
@@ -14,16 +13,12 @@ import {
 import {useNavigation} from 'react-navigation-hooks';
 import {useDispatch} from 'react-redux';
 import * as yup from 'yup';
+import {LoginRequest} from './redux/actions';
 
 export interface Props {}
 
 const validationSchema = yup.object().shape({
-  email: yup
-    .string()
-    .trim()
-    .label('Email')
-    .email('Email không hợp lệ')
-    .required('* Vui lòng nhập email'),
+  username: yup.string().trim().required('* Vui lòng nhập tên đăng nhập'),
   password: yup
     .string()
     .required('* Vui lòng nhập mật khẩu')
@@ -38,7 +33,7 @@ const LoginPage: React.FC<Props> = (props) => {
 
   let inputs = {};
   const focusTheField = (id) => {
-    inputs[id]._root.focus();
+    inputs[id].focus();
   };
 
   return (
@@ -51,10 +46,10 @@ const LoginPage: React.FC<Props> = (props) => {
           Đăng nhập
         </CText>
         <Formik
-          initialValues={{email: '', password: ''}}
+          initialValues={{username: '', password: ''}}
           isInitialValid={false}
           validationSchema={validationSchema}
-          onSubmit={(values) => console.log(values)}>
+          onSubmit={(values) => dispatch(LoginRequest.get(values))}>
           {({
             handleChange,
             handleBlur,
@@ -66,57 +61,36 @@ const LoginPage: React.FC<Props> = (props) => {
             setFieldTouched,
           }) => {
             return (
-              <View style={{marginTop: 28 * ratio}}>
+              <View
+                style={{marginTop: 28 * ratio, marginHorizontal: 16 * ratio}}>
                 <View>
-                  <Form style={{marginRight: 16 * ratio}}>
-                    <Item floatingLabel>
-                      <Label style={styles.input}>Email</Label>
-                      <Input
-                        placeholder="Email"
-                        style={styles.input}
-                        onTouchStart={() => setFieldTouched('email')}
-                        onChangeText={handleChange('email')}
-                        onBlur={handleBlur('email')}
-                        value={values.email}
-                        blurOnSubmit={false}
-                        returnKeyType={'next'}
-                        onSubmitEditing={() => {
-                          focusTheField('password');
-                        }}
-                      />
-                    </Item>
-                    {touched.email && errors.email && (
-                      <CText
-                        color="red"
-                        fontSize={12 * ratio}
-                        style={styles.errorText}>
-                        {errors.email}
-                      </CText>
-                    )}
-                    <Item floatingLabel>
-                      <Label style={styles.input}>Mật khẩu</Label>
-                      <Input
-                        secureTextEntry={true}
-                        placeholder="Mật khẩu"
-                        style={styles.input}
-                        onTouchStart={() => setFieldTouched('password')}
-                        onChangeText={handleChange('password')}
-                        onBlur={handleBlur('password')}
-                        value={values.password}
-                        getRef={(input) => {
-                          inputs['password'] = input;
-                        }}
-                      />
-                    </Item>
-                    {touched.password && errors.password && (
-                      <CText
-                        color="red"
-                        fontSize={12 * ratio}
-                        style={styles.errorText}>
-                        {errors.password}
-                      </CText>
-                    )}
-                  </Form>
+                  <AnimatedInput
+                    placeholder="Tên đăng nhập"
+                    onTouchStart={() => setFieldTouched('username')}
+                    onChangeText={handleChange('username')}
+                    onBlur={handleBlur('username')}
+                    value={values.username}
+                    returnKeyType={'next'}
+                    onSubmitEditing={() => {
+                      focusTheField('password');
+                    }}
+                    textError={errors.username}
+                    textSize={16}
+                  />
+                  <AnimatedInput
+                    secureTextEntry={true}
+                    placeholder="Mật khẩu"
+                    style={{marginTop: 16 * ratio}}
+                    onTouchStart={() => setFieldTouched('password')}
+                    onChangeText={handleChange('password')}
+                    onBlur={handleBlur('password')}
+                    value={values.password}
+                    getRef={(input) => {
+                      inputs['password'] = input;
+                    }}
+                    textError={errors.password}
+                    textSize={16}
+                  />
                 </View>
                 <View style={styles.bottomWrap}>
                   <TouchableOpacity onPress={() => navigate('ForgotPassword')}>
@@ -178,10 +152,6 @@ const styles = StyleSheet.create({
     height: 64 * ratio,
     borderRadius: 4 * ratio,
   },
-  errorText: {
-    marginLeft: 16,
-    marginTop: 8 * ratio,
-  },
   btnStyle: {
     backgroundColor: COLOR.PRIMARY_ACTIVE,
     borderRadius: 25,
@@ -193,7 +163,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginVertical: 50 * ratio,
-    marginHorizontal: 16 * ratio,
   },
   bottomWrap: {
     flex: 1,
@@ -201,7 +170,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     marginTop: 16 * ratio,
-    marginHorizontal: 16 * ratio,
   },
   bottomTxt: {
     fontFamily: 'Cabin-Regular',

@@ -40,7 +40,7 @@ class ModalScreen extends React.Component<Props, State> {
     this.setState({
       isShow: true,
       title: iTitle,
-      content: iContent,
+      content: iContent || 'Đã có lỗi xảy ra',
       type: iType ? iType : MODAL_TYPE.NORMAL,
       onPress: onPress ? onPress : () => {},
     });
@@ -68,13 +68,13 @@ class ModalScreen extends React.Component<Props, State> {
           <View style={styles.main}>
             <View style={styles.boxContent}>
               <View style={styles.content}>
-                <CText fontSize={16 * ratio} bold>
+                <CText fontSize={18 * ratio} bold>
                   {this.state.title}
                 </CText>
                 <CText
                   numberOfLines={3}
-                  fontSize={14 * ratio}
-                  style={{marginTop: 32 * ratio}}>
+                  fontSize={16 * ratio}
+                  style={{marginTop: 16 * ratio, textAlign: 'center'}}>
                   {this.state.content}
                 </CText>
               </View>
@@ -83,8 +83,12 @@ class ModalScreen extends React.Component<Props, State> {
                 <View style={styles.buttonContainer}>
                   <CText
                     touch
-                    onPress={() => this.closeModal()}
-                    fontSize={16 * ratio}
+                    bold
+                    onPress={() => {
+                      this.state.onPress();
+                      this.closeModal();
+                    }}
+                    fontSize={18 * ratio}
                     color={COLOR.PRIMARY_ACTIVE}>
                     OK
                   </CText>
@@ -93,20 +97,22 @@ class ModalScreen extends React.Component<Props, State> {
                 <View style={styles.buttonContainer}>
                   <CText
                     touch
+                    style={{flex: 1, textAlign: 'center'}}
                     onPress={() => this.closeModal()}
-                    fontSize={16 * ratio}
+                    fontSize={18 * ratio}
                     color={COLOR.PRIMARY_ACTIVE}>
                     Hủy
                   </CText>
                   <View style={styles.heightSeperate} />
                   <CText
                     touch
+                    style={{flex: 1, textAlign: 'center'}}
                     onPress={() => {
                       this.state.onPress();
                       this.closeModal();
                     }}
                     bold
-                    fontSize={16 * ratio}
+                    fontSize={18 * ratio}
                     color={COLOR.PRIMARY_ACTIVE}>
                     OK
                   </CText>
@@ -140,13 +146,13 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   buttonContainer: {
+    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-around',
     height: 48 * ratio,
   },
   boxContent: {
     width: 300,
-    height: 250,
+    height: 200,
     backgroundColor: 'white',
     borderRadius: 10,
     alignItems: 'center',
