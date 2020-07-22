@@ -1,7 +1,6 @@
-import {CButton, CText} from 'components';
+import {AnimatedInput, CButton, CText} from 'components';
 import {COLOR, ratio} from 'config/themeUtils';
 import {Formik} from 'formik';
-import {Form, Input, Item, Label} from 'native-base';
 import React from 'react';
 import {
   ScrollView,
@@ -37,11 +36,7 @@ const ForgotPasswordPage: React.FC<Props> = (props) => {
         <TouchableOpacity
           style={{marginTop: 52 * ratio, marginLeft: 16 * ratio}}
           onPress={() => goBack()}>
-          <Feather
-            name={'chevron-left'}
-            color='#222222'
-            size={24 * ratio}
-          />
+          <Feather name={'chevron-left'} color="#222222" size={24 * ratio} />
         </TouchableOpacity>
         <CText
           fontSize={28 * ratio}
@@ -64,32 +59,23 @@ const ForgotPasswordPage: React.FC<Props> = (props) => {
             setFieldTouched,
           }) => {
             return (
-              <View style={{marginTop: 28 * ratio}}>
-                <CText fontSize={16 * ratio} style={{margin: 16 * ratio}}>
+              <View
+                style={{marginTop: 28 * ratio, marginHorizontal: 16 * ratio}}>
+                <CText fontSize={16 * ratio}>
                   Vui lòng nhập email. Bạn sẽ nhận được được dẫn tạo mật khẩu
                   mới qua email.
                 </CText>
-                <Form style={{marginRight: 16}}>
-                  <Item floatingLabel>
-                    <Label style={styles.input}>Email</Label>
-                    <Input
-                      placeholder="Email"
-                      style={styles.input}
-                      onTouchStart={() => setFieldTouched('email')}
-                      onChangeText={handleChange('email')}
-                      onBlur={handleBlur('email')}
-                      value={values.email}
-                    />
-                  </Item>
-                  {touched.email && errors.email && (
-                    <CText
-                      color="red"
-                      fontSize={12 * ratio}
-                      style={styles.errorText}>
-                      {errors.email}
-                    </CText>
-                  )}
-                </Form>
+                <AnimatedInput
+                  placeholder="Email"
+                  style={styles.input}
+                  onTouchStart={() => setFieldTouched('email')}
+                  onChangeText={handleChange('email')}
+                  onBlur={handleBlur('email')}
+                  value={values.email}
+                  textError={errors.email}
+                  textSize={16}
+                  keyboardType="email-address"
+                />
                 <CButton
                   style={[
                     styles.btnStyle,
@@ -118,15 +104,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
   },
   input: {
-    fontFamily: 'Cabin-Regular',
-    fontSize: 16 * ratio,
-    color: 'black',
-    height: 64 * ratio,
-    borderRadius: 4 * ratio,
-  },
-  errorText: {
-    marginLeft: 16,
-    marginTop: 8 * ratio,
+    marginTop: 24 * ratio,
   },
   btnStyle: {
     backgroundColor: COLOR.PRIMARY_ACTIVE,
@@ -139,6 +117,5 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginVertical: 50 * ratio,
-    marginHorizontal: 16 * ratio,
   },
 });

@@ -66,5 +66,7 @@ const styles = StyleSheet.create({
   button: {
     height: 48 * ratio,
     backgroundColor: COLOR.PRIMARY_ACTIVE,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
