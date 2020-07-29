@@ -50,7 +50,7 @@ class Header extends React.Component<Props, {}> {
               bold
               style={
                 this.props.type === HEADER_TYPE.MAIN
-                  ? {fontFamily: 'Pacifico-Regular'}
+                  ? {fontFamily: 'Pacifico-Regular', width: '100%', textAlign: 'center'}
                   : {}
               }
               color="white"
@@ -86,9 +86,9 @@ const styles = StyleSheet.create({
   headerWrap: {
     width: '100%',
     flexDirection: 'row',
-    height: isIphoneX() ? 168 * ratio : 88 * ratio,
+    height: isIphoneX() ? 168 * ratio : 118 * ratio,
     paddingTop: isIphoneX() ? 60 : 0,
-    paddingBottom: 8 * ratio,
+    paddingBottom: 38 * ratio,
     paddingHorizontal: 16 * ratioW,
     alignItems: 'flex-end',
     justifyContent: 'space-between',
@@ -99,7 +99,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   titleContainer: {
-    flex: 0.6,
+    flex: 0.7,
     alignItems: 'center',
     justifyContent: 'center',
   },

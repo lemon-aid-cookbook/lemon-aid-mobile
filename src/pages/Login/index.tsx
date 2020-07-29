@@ -41,8 +41,9 @@ const LoginPage: React.FC<Props> = (props) => {
       <StatusBar translucent={true} backgroundColor="transparent" />
       <ScrollView>
         <CText
+          bold
           fontSize={28 * ratio}
-          style={{alignSelf: 'center', marginTop: 80 * ratio}}>
+          style={{marginTop: 80 * ratio, marginHorizontal: 16 * ratio}}>
           Đăng nhập
         </CText>
         <Formik

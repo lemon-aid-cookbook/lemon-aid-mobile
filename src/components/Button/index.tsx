@@ -52,7 +52,7 @@ class ButtonComponent extends PureComponent<Props, States> {
         onPress={onPress}
         disabled={disabled}
         style={[styles.button, {backgroundColor: color}, style ? style : {}]}>
-        <CText fontSize={fontSize} color={textColor}>
+        <CText fontSize={fontSize} color={textColor} bold>
           {title}
         </CText>
       </TouchableOpacity>

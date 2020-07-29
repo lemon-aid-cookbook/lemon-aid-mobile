@@ -14,6 +14,7 @@ const FavoritePage: React.FC<Props> = (props) => {
     return (
       <View style={styles.container}>
         <CHeader type={HEADER_TYPE.NORMAL} headerTitle="Yêu thích" />
+        <View style={styles.listWrap}>
         <CText fontSize={16 * ratio} style={styles.text}>
           Bạn chưa đăng nhập. Vui lòng đăng nhập để xem các công thức đã thích.
         </CText>
@@ -22,6 +23,7 @@ const FavoritePage: React.FC<Props> = (props) => {
           title="Đăng nhập"
           onPress={() => navigate('Profile')}
         />
+        </View>
       </View>
     );
   }
@@ -36,7 +38,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: 'white',
-    alignItems: 'center',
   },
   text: {
     textAlign: 'center',
@@ -47,4 +48,12 @@ const styles = StyleSheet.create({
     width: 120 * ratio,
     borderRadius: 10 * ratio,
   },
+  listWrap: {
+    flex: 1,
+    marginTop: -24 * ratio,
+    borderTopLeftRadius: 24 * ratio,
+    borderTopRightRadius: 24 * ratio,
+    backgroundColor: 'white',
+    alignItems: 'center',
+  }
 });

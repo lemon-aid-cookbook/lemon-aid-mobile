@@ -51,7 +51,7 @@ const SearchStack = createStackNavigator(
     initialRouteName: 'Search',
     navigationOptions: {
       tabBarIcon: ({tintColor}) => (
-        <Feather name="search" size={24 * ratio} color={tintColor} />
+        <Feather name="compass" size={24 * ratio} color={tintColor} />
       ),
     },
   },
