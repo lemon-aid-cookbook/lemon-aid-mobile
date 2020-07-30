@@ -11,6 +11,7 @@ import CameraPage from 'pages/Camera';
 import FavoritePage from 'pages/Favorite';
 import SignUpPage from 'pages/SignUp';
 import ForgotPasswordPage from 'pages/Login/components/forgotPassword.page';
+import ProfilePage from 'pages/Profile';
 
 const CameraStack = createStackNavigator(
   {
@@ -68,25 +69,25 @@ const LoginStack = createStackNavigator(
   },
 );
 
-// const ProfileStack = createStackNavigator(
-//   {
-//     ProfilePage: ProfilePage,
-//     Setting: SettingPage,
-//     ChangeInformation: ChangeInformationPage,
-//     ChangeAvatar: ChangeAvatarPage,
-//   },
-//   {
-//     headerMode: 'none',
-//     initialRouteName: 'ProfilePage',
-//   },
-// );
+const ProfileStack = createStackNavigator(
+  {
+    ProfilePage: ProfilePage,
+    // Setting: SettingPage,
+    // ChangeInformation: ChangeInformationPage,
+    // ChangeAvatar: ChangeAvatarPage,
+  },
+  {
+    headerMode: 'none',
+    initialRouteName: 'ProfilePage',
+  },
+);
 
 const ProfileSwitch = createSwitchNavigator(
   {
     // Loading: LoadingPage,
     Login: LoginStack,
     SignUp: SignUpPage,
-    // ProfileStack: ProfileStack,
+    ProfileStack: ProfileStack,
   },
   {
     headerMode: 'none',

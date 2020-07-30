@@ -3,6 +3,7 @@ import {PixelRatio, Platform, Dimensions} from 'react-native';
 export const HEADER_TYPE = {
   NORMAL: 'NORMAL',
   MAIN: 'MAIN',
+  SEARCH: 'SEARCH'
 };
 
 export const MODAL_TYPE = {
