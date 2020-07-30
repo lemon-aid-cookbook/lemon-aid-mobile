@@ -21,15 +21,24 @@ const loginRequest$ = (action$: Observable<PlainAction>) =>
   action$.pipe(
     ofType(LoginRequest.type),
     exhaustMap((action: any) => {
+      console.log(action.payload)
       GlobalLoadingSetup.getLoading().isVisible();
       return request<any>({
         method: 'POST',
         url: 'signin',
         param: action.payload,
+        option: {
+          format: 'json'
+        }
       }).pipe(
         map((value) => {
           GlobalLoadingSetup.getLoading().isHide();
           if ((value as any).status === 200) {
+            store.dispatch(
+              NavigationActions.navigate({
+                routeName: 'Search',
+              }),
+            )
             return LoginRequestSuccess.get((value as any).data);
           }
           return LoginRequestFailed.get(value.data);
