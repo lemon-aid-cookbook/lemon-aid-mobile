@@ -5,7 +5,6 @@ import {useNavigation} from 'react-navigation-hooks';
 import {useSelector} from 'react-redux';
 import {ratio, HEADER_TYPE} from 'config/themeUtils';
 import RecipeItem from 'pages/Search/components/recipeItem';
-import { store } from 'reduxs';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 export interface Props {
   listFavorite: any[]
@@ -53,7 +52,7 @@ const FavoritePage: React.FC<Props> = (props) => {
   const _renderItem = ({item, index}: {item: any; index: string}) => {
     return (
       <View style={{ width: '100%'}}>
-        <TouchableOpacity onPress={() => {  console.info(store.Auth) }}>
+        <TouchableOpacity onPress={() => {  console.info() }}>
         <RecipeItem item={item} />
         </TouchableOpacity>
       </View>
