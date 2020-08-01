@@ -12,6 +12,7 @@ import FavoritePage from 'pages/Favorite';
 import SignUpPage from 'pages/SignUp';
 import ForgotPasswordPage from 'pages/Login/components/forgotPassword.page';
 import ProfilePage from 'pages/Profile';
+import LoadingPage from 'pages/Login/components/loading.page';
 
 const CameraStack = createStackNavigator(
   {
@@ -84,7 +85,7 @@ const ProfileStack = createStackNavigator(
 
 const ProfileSwitch = createSwitchNavigator(
   {
-    // Loading: LoadingPage,
+    Loading: LoadingPage,
     Login: LoginStack,
     SignUp: SignUpPage,
     ProfileStack: ProfileStack,
@@ -96,7 +97,7 @@ const ProfileSwitch = createSwitchNavigator(
         <Feather name="user" size={24 * ratio} color={tintColor} />
       ),
     },
-    initialRouteName: 'Login',
+    initialRouteName: 'Loading',
   },
 );
 
