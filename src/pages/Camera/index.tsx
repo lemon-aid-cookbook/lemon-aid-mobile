@@ -16,7 +16,10 @@ import axios from 'axios';
 import ImagePicker from 'react-native-image-picker';
 import translate from 'google-translate-open-api';
 
-export interface Props {}
+export interface Props {
+  
+}
+
 const CameraPage: React.FC<Props> = (props) => {
   const {goBack, navigate} = useNavigation();
   const [imgUrl, setImgUrl] = useState('');
@@ -132,7 +135,9 @@ const CameraPage: React.FC<Props> = (props) => {
     </View>
   );
 };
+
 export default CameraPage;
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
