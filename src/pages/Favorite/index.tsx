@@ -5,9 +5,9 @@ import {useNavigation} from 'react-navigation-hooks';
 import {useSelector} from 'react-redux';
 import {ratio, HEADER_TYPE} from 'config/themeUtils';
 import RecipeItem from 'pages/Search/components/recipeItem';
-import { TouchableOpacity } from 'react-native-gesture-handler';
+import {TouchableOpacity} from 'react-native-gesture-handler';
 export interface Props {
-  listFavorite: any[]
+  listFavorite: any[];
 }
 
 const defaultProps = {
@@ -51,9 +51,12 @@ const FavoritePage: React.FC<Props> = (props) => {
 
   const _renderItem = ({item, index}: {item: any; index: string}) => {
     return (
-      <View style={{ width: '100%'}}>
-        <TouchableOpacity onPress={() => {  console.info() }}>
-        <RecipeItem item={item} />
+      <View style={{width: '100%'}}>
+        <TouchableOpacity
+          onPress={() => {
+            console.info();
+          }}>
+          <RecipeItem item={item} />
         </TouchableOpacity>
       </View>
     );
@@ -63,15 +66,16 @@ const FavoritePage: React.FC<Props> = (props) => {
     return (
       <View style={styles.container}>
         <CHeader type={HEADER_TYPE.NORMAL} headerTitle="Yêu thích" />
-        <View style={styles.listWrap}>
-        <CText fontSize={16 * ratio} style={styles.text}>
-          Bạn chưa đăng nhập. Vui lòng đăng nhập để xem các công thức đã thích.
-        </CText>
-        <CButton
-          style={styles.btnStyle}
-          title="Đăng nhập"
-          onPress={() => navigate('Profile')}
-        />
+        <View style={[styles.listWrap, {alignItems: 'center'}]}>
+          <CText fontSize={16 * ratio} style={styles.text}>
+            Bạn chưa đăng nhập. Vui lòng đăng nhập để xem các công thức đã
+            thích.
+          </CText>
+          <CButton
+            style={styles.btnStyle}
+            title="Đăng nhập"
+            onPress={() => navigate('Profile')}
+          />
         </View>
       </View>
     );
@@ -79,15 +83,15 @@ const FavoritePage: React.FC<Props> = (props) => {
 
   return (
     <View style={styles.container}>
-      <CHeader type={HEADER_TYPE.NORMAL} headerTitle={'Yêu thích'}/>
-       <View style={styles.listWrap}>
-       <FlatList
+      <CHeader type={HEADER_TYPE.NORMAL} headerTitle={'Yêu thích'} />
+      <View style={styles.listWrap}>
+        <FlatList
           data={props.listFavorite}
           keyExtractor={(index) => index.toString()}
           renderItem={_renderItem}
           showsVerticalScrollIndicator={false}
         />
-       </View>
+      </View>
     </View>
   );
 };
@@ -114,6 +118,5 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 24 * ratio,
     borderTopRightRadius: 24 * ratio,
     backgroundColor: 'white',
-    // alignItems: 'center',
-  }
+  },
 });

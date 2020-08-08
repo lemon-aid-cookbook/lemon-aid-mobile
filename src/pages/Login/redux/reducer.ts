@@ -1,6 +1,6 @@
 import {PlainAction} from 'redux-typed-actions';
 import {AuthState} from '../model';
-import {LoginRequestSuccess} from './actions';
+import {LoginRequestSuccess, SignoutRequest} from './actions';
 
 const initialState: AuthState = {
   token: null,
@@ -14,6 +14,8 @@ export function authReducer(
   switch (action.type) {
     case LoginRequestSuccess.type:
       return {...state, token: action.payload.token, user: action.payload.user};
+    case SignoutRequest.type:
+      return {...state, token: null, user: null};
     default:
       return state;
   }
