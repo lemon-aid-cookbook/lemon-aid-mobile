@@ -94,7 +94,7 @@ class Header extends React.Component<Props, State, {}> {
                         width: '100%',
                         textAlign: 'center',
                       }
-                    : {}
+                    : {marginVertical: -26}
                 }
                 color="white"
                 fontSize={this.props.smallTitle ? 20 * ratio : 28 * ratio}>

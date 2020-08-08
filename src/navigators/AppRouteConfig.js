@@ -88,7 +88,7 @@ const ProfileSwitch = createSwitchNavigator(
     Loading: LoadingPage,
     Login: LoginStack,
     SignUp: SignUpPage,
-    ProfileStack: ProfileStack,
+    Profile: ProfileStack,
   },
   {
     headerMode: 'none',
@@ -97,7 +97,8 @@ const ProfileSwitch = createSwitchNavigator(
         <Feather name="user" size={24 * ratio} color={tintColor} />
       ),
     },
-    initialRouteName: 'Loading',
+    initialRouteName: 'Profile',
+
   },
 );
 
