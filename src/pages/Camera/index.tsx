@@ -87,6 +87,7 @@ const CameraPage: React.FC<Props> = (props) => {
           width: '100%',
           alignItems: 'center',
           justifyContent: 'flex-end',
+          paddingHorizontal: 16 * ratio,
         }}>
         <CButton
                   style={[
@@ -150,6 +151,7 @@ const styles = StyleSheet.create({
     fontSize: 17,
   },
   btnStyle: {
+    width: '100%',
     backgroundColor: COLOR.PRIMARY_ACTIVE,
     borderRadius: 25,
     elevation: 4,
