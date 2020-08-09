@@ -1,4 +1,10 @@
-import {CText, CHeader, GlobalLoadingSetup, GlobalModalSetup, CButton} from 'components';
+import {
+  CText,
+  CHeader,
+  GlobalLoadingSetup,
+  GlobalModalSetup,
+  CButton,
+} from 'components';
 import React, {useState} from 'react';
 import {
   StyleSheet,
@@ -18,9 +24,7 @@ import translate from 'google-translate-open-api';
 import RNFetchBlob from 'rn-fetch-blob';
 // import request from 'request'
 
-export interface Props {
-  
-}
+export interface Props {}
 
 const CameraPage: React.FC<Props> = (props) => {
   const {goBack, navigate} = useNavigation();
@@ -28,11 +32,11 @@ const CameraPage: React.FC<Props> = (props) => {
   let camera = null;
 
   const result = translate(`Beefsteak`, {
-    to: "vi",
+    to: 'vi',
   }).then((result) => {
     const val = result.data[0];
-    console.info(val)
-  })
+    console.info(val);
+  });
 
   const uploadImage = () => {
     // const options = {quality: 0.5, base64: true};
@@ -44,7 +48,8 @@ const CameraPage: React.FC<Props> = (props) => {
       },
       (result) => {
         if (!result.didCancel) {
-          console.info(result)
+          setImgUrl(result.uri);
+          console.info(result);
           // const formData = new FormData();
           // formData.append('image', result);
           updateAva(result);
@@ -57,45 +62,49 @@ const CameraPage: React.FC<Props> = (props) => {
     const api_user_token = 'cf032a75373319fbb7eabcda1cd5f3edd9348691';
     const axiosConfig = {
       headers: {
-        'Accept': 'application/json',
+        Accept: 'application/json',
         'Content-Type': 'multipart/form-data',
-        'Authorization': 'Bearer ' + api_user_token,
-        'Access-Control-Allow-Origin': true
+        Authorization: 'Bearer ' + api_user_token,
+        'Access-Control-Allow-Origin': true,
       },
-    }
+    };
     // axios.post(`https://api.logmeal.es/v2/recognition/dish`, formData,axiosConfig)
     // .then((res) => console.info(res))
     // .catch((er) => console.info(er))
-    RNFetchBlob.fetch('POST', 'https://api.logmeal.es/v2/recognition/dish', {
-    Authorization : 'Bearer ' + api_user_token,
-    'Content-Type' : 'multipart/form-data',
-  }, RNFetchBlob.wrap(formData.path))
-  .then((res) => {
-    console.info(res)
-  })
-  .catch((err) => {
-    console.info(err)
-    // error handling ..
-  })
+    RNFetchBlob.fetch(
+      'POST',
+      'https://api.logmeal.es/v2/recognition/dish',
+      {
+        Authorization: 'Bearer ' + api_user_token,
+        'Content-Type': 'multipart/form-data',
+      },
+      RNFetchBlob.wrap(formData.path),
+    )
+      .then((res) => {
+        console.info(res);
+      })
+      .catch((err) => {
+        console.info(err);
+        // error handling ..
+      });
   };
 
   const renderCamera = () => {
     return (
       <View
-         style={{
+        style={{
           flex: 1,
           width: '100%',
-          alignItems: 'center',
+          alignSelf: 'flex-end',
           justifyContent: 'flex-end',
-          paddingHorizontal: 16 * ratio,
         }}>
         <CButton
-                  style={[
-                    styles.btnStyle,
-                  ]}
-                  title="Chọn hình"
-                  onPress={() => {uploadImage()}}
-                />
+          style={[styles.btnStyle]}
+          title="Chọn hình"
+          onPress={() => {
+            uploadImage();
+          }}
+        />
       </View>
     );
   };
@@ -103,9 +112,24 @@ const CameraPage: React.FC<Props> = (props) => {
   return (
     <View style={styles.container}>
       <CHeader type={HEADER_TYPE.MAIN} />
-      <View style={styles.listWrap}>
-        {renderCamera()}
-      </View>
+      {imgUrl ? (
+        <ImageBackground
+          blurRadius={1}
+          source={{uri: imgUrl}}
+          style={styles.listWrap}>
+          {renderCamera()}
+        </ImageBackground>
+      ) : (
+        <ImageBackground
+          blurRadius={3}
+          source={{
+            uri:
+              'https://images.unsplash.com/photo-1511690743698-d9d85f2fbf38?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=634&q=80',
+          }}
+          style={styles.listWrap}>
+          {renderCamera()}
+        </ImageBackground>
+      )}
     </View>
   );
 };
@@ -119,11 +143,8 @@ const styles = StyleSheet.create({
   listWrap: {
     flex: 1,
     marginTop: -24 * ratio,
-    borderTopLeftRadius: 24 * ratio,
-    borderTopRightRadius: 24 * ratio,
     backgroundColor: 'white',
-    paddingTop: 16 * ratio,
-    // paddingHorizontal: 16 * ratio,
+    paddingHorizontal: 16 * ratio,
   },
   preview: {
     flex: 1,
