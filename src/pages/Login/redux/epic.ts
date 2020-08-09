@@ -36,7 +36,7 @@ const loginRequest$ = (action$: Observable<PlainAction>) =>
           if ((value as any).status === 200) {
             store.dispatch(
               NavigationActions.navigate({
-                routeName: 'Search',
+                routeName: 'Profile',
               }),
             );
             return LoginRequestSuccess.get((value as any).data);

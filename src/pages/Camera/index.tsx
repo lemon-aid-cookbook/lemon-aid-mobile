@@ -1,4 +1,4 @@
-import {CText, CHeader, GlobalLoadingSetup, GlobalModalSetup} from 'components';
+import {CText, CHeader, GlobalLoadingSetup, GlobalModalSetup, CButton} from 'components';
 import React, {useState} from 'react';
 import {
   StyleSheet,
@@ -9,12 +9,14 @@ import {
   ImageBackground,
 } from 'react-native';
 import {useNavigation} from 'react-navigation-hooks';
-import {HEADER_TYPE, ratio} from 'config/themeUtils';
+import {HEADER_TYPE, ratio, COLOR} from 'config/themeUtils';
 import {RNCamera} from 'react-native-camera';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import axios from 'axios';
 import ImagePicker from 'react-native-image-picker';
 import translate from 'google-translate-open-api';
+import RNFetchBlob from 'rn-fetch-blob';
+// import request from 'request'
 
 export interface Props {
   
@@ -42,14 +44,10 @@ const CameraPage: React.FC<Props> = (props) => {
       },
       (result) => {
         if (!result.didCancel) {
-          const file = {
-            uri: result.uri,
-            type: result.type,
-            name: result.fileName || result.uri.split('/') && result.uri.split('/')[result.uri.split('/').length - 1] || Date.now().toString(),
-          };
-          const formData = new FormData();
-          formData.append('image', file);
-          updateAva(formData);
+          console.info(result)
+          // const formData = new FormData();
+          // formData.append('image', result);
+          updateAva(result);
         }
       },
     );
@@ -57,72 +55,47 @@ const CameraPage: React.FC<Props> = (props) => {
 
   const updateAva = async (formData: any) => {
     const api_user_token = 'cf032a75373319fbb7eabcda1cd5f3edd9348691';
-    // const res = await axios.request({
-    //   url: `https://api.logmeal.es/v2/recognition/dish/v0.8?language=eng`,
-    //   headers: {
-    //     Accept: 'application/json',
-    //     'Content-Type': 'multipart/form-data',
-    //     Authorization: 'Bearer ' + api_user_token,
-    //   },
-    //   data: formData,
-    //   method: 'post',
-    // });
-    // if (res.status === 200) {
-    //   GlobalLoadingSetup.getLoading().isHide();
-    //   console.info(res.data);
-    // } else {
-    //   console.info(res.data)
-    //   GlobalLoadingSetup.getLoading().isHide();
-    //   GlobalModalSetup.getGlobalModalHolder().alertMessage(
-    //     'Thông báo',
-    //     'Có lỗi xảy ra. Vui lòng thử lại sau.',
-    //   );
-    // }
-    const res = await fetch(
-      'https://api.logmeal.es/v2/recognition/dish/v0.8?language=eng',
-      {
-      method: 'POST',
+    const axiosConfig = {
       headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'multipart/form-data',
         'Authorization': 'Bearer ' + api_user_token,
-      'Accept': 'application/json',
-      'Content-Type': 'multipart/form-data'
+        'Access-Control-Allow-Origin': true
       },
-      body: formData,
-      })
-    if (res.status === 200) {
-      GlobalLoadingSetup.getLoading().isHide();
-      console.info(res);
-    } else {
-      console.info(res)
-      GlobalLoadingSetup.getLoading().isHide();
-      GlobalModalSetup.getGlobalModalHolder().alertMessage(
-        'Thông báo',
-        'Có lỗi xảy ra. Vui lòng thử lại sau.',
-      );
     }
+    // axios.post(`https://api.logmeal.es/v2/recognition/dish`, formData,axiosConfig)
+    // .then((res) => console.info(res))
+    // .catch((er) => console.info(er))
+    RNFetchBlob.fetch('POST', 'https://api.logmeal.es/v2/recognition/dish', {
+    Authorization : 'Bearer ' + api_user_token,
+    'Content-Type' : 'multipart/form-data',
+  }, RNFetchBlob.wrap(formData.path))
+  .then((res) => {
+    console.info(res)
+  })
+  .catch((err) => {
+    console.info(err)
+    // error handling ..
+  })
   };
 
   const renderCamera = () => {
     return (
-      <RNCamera
-        style={{
+      <View
+         style={{
           flex: 1,
           width: '100%',
           alignItems: 'center',
           justifyContent: 'flex-end',
-        }}
-        ref={(ref) => {
-          camera = ref;
         }}>
-        <TouchableOpacity
-          style={styles.capture}
-          onPress={() => {}}></TouchableOpacity>
-      </RNCamera>
-      // <View>
-      //   <TouchableOpacity onPress={() => {uploadImage()}}>
-      //     <CText>Thêm hình</CText>
-      //   </TouchableOpacity>
-      // </View>
+        <CButton
+                  style={[
+                    styles.btnStyle,
+                  ]}
+                  title="Chọn hình"
+                  onPress={() => {uploadImage()}}
+                />
+      </View>
     );
   };
 
@@ -175,5 +148,17 @@ const styles = StyleSheet.create({
     color: '#FFF',
     fontWeight: '600',
     fontSize: 17,
+  },
+  btnStyle: {
+    backgroundColor: COLOR.PRIMARY_ACTIVE,
+    borderRadius: 25,
+    elevation: 4,
+    shadowOffset: {width: 5, height: 5},
+    shadowColor: 'grey',
+    shadowOpacity: 0.5,
+    shadowRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginVertical: 50 * ratio,
   },
 });

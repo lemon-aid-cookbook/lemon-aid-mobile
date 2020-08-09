@@ -57,7 +57,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 40,
-    letterSpacing: 4,
+    letterSpacing: 3,
     fontFamily: 'Pacifico-Regular',
     color: COLOR.PRIMARY_ACTIVE,
   },

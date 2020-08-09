@@ -68,11 +68,11 @@ const ProfilePage: React.FC<Props> = (props) => {
        headerTitle='Trang cá nhân'
        type={HEADER_TYPE.NORMAL}
       />
-      <View style={{flexDirection: 'row'}}>
+      <View style={{flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center', marginTop: 20 * ratio,}}>
         <Image
-          style={{width: 70, height: 70, marginLeft: 25, marginTop: 41.5, borderRadius: 100}}
+          style={{width: 70 * ratio, height: 70 * ratio, marginLeft: 25 * ratio,  borderRadius: 35 * ratio}}
           source={{ uri: props.avatar, }}/>
-        <View style={{flexDirection: 'column', marginLeft: 15, marginTop: 35}}>
+        <View style={{flexDirection: 'column', marginLeft: 15}}>
           <CText bold style={{fontSize: 20}}>
             {props.name}
           </CText>
@@ -86,7 +86,7 @@ const ProfilePage: React.FC<Props> = (props) => {
           </CText>
         </View>
       </View>
-      <CText bold style={{fontSize: 22, color: COLOR.PRIMARY_ACTIVE, paddingTop: 25, paddingLeft: 25}}>
+      <CText bold  fontSize={22} style={{color: COLOR.PRIMARY_ACTIVE, paddingVertical: 20 * ratio, paddingLeft: 25 * ratio}}>
        Công thức của bạn
       </CText>
       <FlatList

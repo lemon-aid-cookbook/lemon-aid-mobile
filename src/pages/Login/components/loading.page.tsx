@@ -9,11 +9,11 @@ export interface Props {}
 
 const LoadingPage: React.FC<Props> = (props) => {
   const {goBack, navigate} = useNavigation();
-  const user = useSelector((state) => state.Auth?.user);
+  const user = useSelector((state) => state.Auth?.token);
 
   useEffect(() => {
     if (user) {
-      navigate('ProfileStack');
+      navigate('Profile');
     } else {
       navigate('Login');
     }
