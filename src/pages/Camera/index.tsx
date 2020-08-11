@@ -1,28 +1,11 @@
-import {
-  CText,
-  CHeader,
-  GlobalLoadingSetup,
-  GlobalModalSetup,
-  CButton,
-} from 'components';
-import React, {useState} from 'react';
-import {
-  StyleSheet,
-  View,
-  Text,
-  Image,
-  Dimensions,
-  ImageBackground,
-} from 'react-native';
-import {useNavigation} from 'react-navigation-hooks';
-import {HEADER_TYPE, ratio, COLOR} from 'config/themeUtils';
-import {RNCamera} from 'react-native-camera';
-import {TouchableOpacity} from 'react-native-gesture-handler';
-import axios from 'axios';
-import ImagePicker from 'react-native-image-picker';
+import {CButton, CHeader} from 'components';
+import {COLOR, HEADER_TYPE, ratio} from 'config/themeUtils';
 import translate from 'google-translate-open-api';
+import React, {useState} from 'react';
+import {Dimensions, ImageBackground, StyleSheet, View} from 'react-native';
+import ImagePicker from 'react-native-image-picker';
+import {useNavigation} from 'react-navigation-hooks';
 import RNFetchBlob from 'rn-fetch-blob';
-// import request from 'request'
 
 export interface Props {}
 
@@ -49,44 +32,33 @@ const CameraPage: React.FC<Props> = (props) => {
       (result) => {
         if (!result.didCancel) {
           setImgUrl(result.uri);
-          console.info(result);
-          // const formData = new FormData();
-          // formData.append('image', result);
-          updateAva(result);
+          updateImage(result);
         }
       },
     );
   };
 
-  const updateAva = async (formData: any) => {
+  const updateImage = (result: any) => {
     const api_user_token = 'cf032a75373319fbb7eabcda1cd5f3edd9348691';
-    const axiosConfig = {
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'multipart/form-data',
-        Authorization: 'Bearer ' + api_user_token,
-        'Access-Control-Allow-Origin': true,
-      },
-    };
-    // axios.post(`https://api.logmeal.es/v2/recognition/dish`, formData,axiosConfig)
-    // .then((res) => console.info(res))
-    // .catch((er) => console.info(er))
+
     RNFetchBlob.fetch(
       'POST',
-      'https://api.logmeal.es/v2/recognition/dish',
+      'https://api.logmeal.es/v2/recognition/dish/v0.9?skip_types=%5B1%2C3%5D&language=eng',
       {
-        Authorization: 'Bearer ' + api_user_token,
+        Authorization: `Bearer ${api_user_token}`,
         'Content-Type': 'multipart/form-data',
+        Accept: 'application/json',
       },
-      RNFetchBlob.wrap(formData.path),
+      [
+        {
+          name: 'image',
+          filename: result.fileName,
+          data: result.data,
+        },
+      ],
     )
-      .then((res) => {
-        console.info(res);
-      })
-      .catch((err) => {
-        console.info(err);
-        // error handling ..
-      });
+      .then((res) => console.log(JSON.parse(res.data)))
+      .catch((er) => console.log(er));
   };
 
   const renderCamera = () => {
