@@ -1,4 +1,4 @@
-import {CButton, CHeader} from 'components';
+import {CButton, CHeader, GlobalLoadingSetup, GlobalModalSetup} from 'components';
 import {COLOR, HEADER_TYPE, ratio} from 'config/themeUtils';
 import translate from 'google-translate-open-api';
 import React, {useState} from 'react';
@@ -14,12 +14,7 @@ const CameraPage: React.FC<Props> = (props) => {
   const [imgUrl, setImgUrl] = useState('');
   let camera = null;
 
-  const result = translate(`Beefsteak`, {
-    to: 'vi',
-  }).then((result) => {
-    const val = result.data[0];
-    console.info(val);
-  });
+  
 
   const uploadImage = () => {
     // const options = {quality: 0.5, base64: true};
@@ -40,10 +35,10 @@ const CameraPage: React.FC<Props> = (props) => {
 
   const updateImage = (result: any) => {
     const api_user_token = 'cf032a75373319fbb7eabcda1cd5f3edd9348691';
-
+    GlobalLoadingSetup.getLoading().isVisible();
     RNFetchBlob.fetch(
       'POST',
-      'https://api.logmeal.es/v2/recognition/dish/v0.9?skip_types=%5B1%2C3%5D&language=eng',
+      'https://api.logmeal.es/v2/recognition/dish',
       {
         Authorization: `Bearer ${api_user_token}`,
         'Content-Type': 'multipart/form-data',
@@ -57,8 +52,24 @@ const CameraPage: React.FC<Props> = (props) => {
         },
       ],
     )
-      .then((res) => console.log(JSON.parse(res.data)))
-      .catch((er) => console.log(er));
+      .then((res) => {
+        GlobalLoadingSetup.getLoading().isHide();
+        const data = JSON.parse(res.data)
+        var key = data?.recognition_results?.length > 0 && data.recognition_results[0];
+        const result = translate(key?.name, {
+          to: 'vi',
+        }).then((result) => {
+          const val = result.data[0];
+          console.info(val);
+        });
+      })
+      .catch((er) => {
+        GlobalLoadingSetup.getLoading().isHide();
+        GlobalModalSetup.getGlobalModalHolder().alertMessage(
+          'Thông báo',
+          'Đã có lỗi không mong muốn xảy ra. Vui lòng thử lại.',
+        );
+      });
   };
 
   const renderCamera = () => {
