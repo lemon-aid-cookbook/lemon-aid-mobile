@@ -14,6 +14,7 @@ import {
   SignupRequest,
   SignupRequestFailed,
   SignupRequestSuccess,
+  SignoutRequest,
 } from './actions';
 import {MODAL_TYPE} from 'config/themeUtils';
 
@@ -34,12 +35,7 @@ const loginRequest$ = (action$: Observable<PlainAction>) =>
         map((value) => {
           GlobalLoadingSetup.getLoading().isHide();
           if ((value as any).status === 200) {
-            store.dispatch(
-              NavigationActions.navigate({
-                routeName: 'Profile',
-              }),
-            );
-            return LoginRequestSuccess.get((value as any).data);
+            return LoginRequestSuccess.get((value as any).data);            
           }
           return LoginRequestFailed.get(value.data);
         }),
@@ -98,4 +94,27 @@ const signupRequest$ = (action$: Observable<PlainAction>) =>
     }),
   );
 
-export const authEpics = combineEpics(loginRequest$, signupRequest$);
+  const signOutRequest$ = (action$: Observable<PlainAction>) =>
+  action$.pipe(
+    ofType(SignoutRequest.type),
+    map(() => {
+      return store.dispatch(
+        NavigationActions.navigate({
+          routeName: 'Login',
+        }),
+      );
+    }),
+  );
+
+  const logInSuccess$ = (action$: Observable<PlainAction>) =>
+  action$.pipe(
+    ofType(LoginRequestSuccess.type),
+    map(() => {
+      return store.dispatch(
+        NavigationActions.navigate({
+          routeName: 'Profile',
+        }),
+      );
+    }),
+  );
+export const authEpics = combineEpics(loginRequest$, signupRequest$, signOutRequest$, logInSuccess$);

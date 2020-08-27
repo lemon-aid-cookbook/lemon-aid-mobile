@@ -56,6 +56,8 @@ const styles = StyleSheet.create({
     marginTop: -60,
   },
   title: {
+    width: '100%',
+    textAlign: 'center',
     fontSize: 40,
     letterSpacing: 3,
     fontFamily: 'Pacifico-Regular',

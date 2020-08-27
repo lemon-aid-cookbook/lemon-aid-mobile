@@ -3,7 +3,7 @@ import React from 'react';
 import { Image, StyleSheet, View } from 'react-native';
 import { CText } from 'components';
 import Feather from 'react-native-vector-icons/Feather';
-import Foundation from 'react-native-vector-icons/Foundation';
+import AntDesign from 'react-native-vector-icons/AntDesign';
 
 export interface Props {
   item: any;
@@ -53,7 +53,7 @@ const RecipeItem: React.FC<Props> = (props) => {
             <CText color={COLOR.DEACTIVE_GRAY}>{props.item.time / 60} phút</CText>
           </View>
           <View style={{flexDirection: 'row', alignItems: 'center'}}>
-            <Foundation
+            <AntDesign
               name={'heart'}
               size={14 * ratio}
               color={COLOR.PRIMARY_ACTIVE}

@@ -94,7 +94,7 @@ class Header extends React.Component<Props, State, {}> {
                         width: '100%',
                         textAlign: 'center',
                       }
-                    : {marginVertical: -26}
+                    : { paddingBottom: 5 * ratio}
                 }
                 color="white"
                 fontSize={this.props.smallTitle ? 20 * ratio : 28 * ratio}>
@@ -132,9 +132,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     height: isIphoneX() ? 168 * ratio : 118 * ratio,
     paddingTop: isIphoneX() ? 60 : 0,
-    paddingBottom: 38 * ratio,
     paddingHorizontal: 16 * ratioW,
-    alignItems: 'flex-end',
+    alignItems: 'center',
     justifyContent: 'space-between',
     backgroundColor: COLOR.PRIMARY_ACTIVE,
   },
@@ -146,6 +145,7 @@ const styles = StyleSheet.create({
     flex: 0.7,
     alignItems: 'center',
     justifyContent: 'center',
+
   },
   searchHeaderWrap: {
     width: '100%',

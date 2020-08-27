@@ -1,9 +1,9 @@
 import {CText, CHeader} from 'components';
 import React, {useEffect, useState} from 'react';
-import {StyleSheet, View, FlatList, Image} from 'react-native';
+import {StyleSheet, View, FlatList, Image, TouchableOpacity} from 'react-native';
 import {useNavigation} from 'react-navigation-hooks';
 import {HEADER_TYPE, ratio, COLOR} from 'config/themeUtils';
-import SegmentedControl from '@react-native-community/segmented-control';
+import SegmentedControlTab from "react-native-segmented-control-tab";
 import Feather from 'react-native-vector-icons/Feather';
 import Foundation from 'react-native-vector-icons/Foundation';
 import RecipeItem from './components/recipeItem'
@@ -49,11 +49,17 @@ const SearchPage: React.FC<Props> = (props) => {
   const {goBack, navigate} = useNavigation();
   const [segmentIndex, setSegmentIndex] = useState(0);
 
+  const handleIndexChange = (index: number) => {
+    setSegmentIndex(index)
+  };
+
   const _renderItem = ({item, index}: {item: any; index: string}) => {
     return (
-      <View style={{ width: '100%'}}>
+      <TouchableOpacity onPress={() => { navigate('Detail')}}>
+        <View style={{ width: '100%'}}>
         <RecipeItem item={item} />
       </View>
+      </TouchableOpacity>
     );
   };
 
@@ -66,7 +72,18 @@ const SearchPage: React.FC<Props> = (props) => {
         }}
       />
       <View style={styles.listWrap}>
-        <SegmentedControl
+        <View style={{ marginHorizontal: 16 * ratio, paddingBottom: 10 * ratio}}>
+        <SegmentedControlTab
+          values={['Yêu thích', 'Theo dõi', 'Mới nhất']}
+          selectedIndex={segmentIndex}
+          onTabPress={handleIndexChange}
+          tabStyle={{ backgroundColor: 'white', borderColor: COLOR.PRIMARY_ACTIVE}}
+          activeTabStyle={{ backgroundColor: COLOR.PRIMARY_ACTIVE}}
+          activeTabTextStyle={{ color: 'white', fontSize: 16 * ratio, fontFamily: 'Cabin-SemiBold'}}
+          tabTextStyle={{fontSize: 16 * ratio, fontFamily: 'Cabin-Regular', color: COLOR.PRIMARY_ACTIVE}}
+        />
+          </View>
+        {/* <SegmentedControl
           values={['Yêu thích', 'Theo dõi', 'Mới nhất']}
           selectedIndex={segmentIndex}
           onChange={(event) => {
@@ -85,7 +102,7 @@ const SearchPage: React.FC<Props> = (props) => {
             fontFamily: 'Cabin-Regular',
           }}
           style={{marginHorizontal: 16 * ratio}}
-        />
+        /> */}
         <FlatList
           data={props.listRecipe}
           keyExtractor={(index) => index.toString()}
@@ -111,7 +128,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 24 * ratio,
     backgroundColor: 'white',
     paddingTop: 16 * ratio,
-    // paddingHorizontal: 16 * ratio
+    paddingVertical: 16 * ratio
   },
   cardItem: {
     marginHorizontal: 16 * ratio,

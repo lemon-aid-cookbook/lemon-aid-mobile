@@ -1,19 +1,30 @@
-import {CText, CButton, CHeader} from 'components';
-import React from 'react';
-import {StyleSheet, View, FlatList, Image} from 'react-native';
-import {useNavigation} from 'react-navigation-hooks';
-import {useSelector} from 'react-redux';
-import {ratio, HEADER_TYPE, COLOR} from 'config/themeUtils';
+import {CHeader, CText} from 'components';
+import {COLOR, HEADER_TYPE, ratio} from 'config/themeUtils';
+import {SignoutRequest} from 'pages/Login/redux/actions';
 import RecipeItem from 'pages/Search/components/recipeItem';
+import React from 'react';
+import {
+  FlatList,
+  Image,
+  StyleSheet,
+  TouchableWithoutFeedback,
+  View,
+} from 'react-native';
+import Feather from 'react-native-vector-icons/Feather';
+import {useNavigation} from 'react-navigation-hooks';
+import {useDispatch, useSelector} from 'react-redux';
+import {TouchableOpacity} from 'react-native-gesture-handler';
+
 export interface Props {
-  avatar: string,
-  name: string,
-  email: string,
-  listFavorite: any[]
+  avatar: string;
+  name: string;
+  email: string;
+  listFavorite: any[];
 }
 
 const defaultProps = {
-  avatar:  'https://reactnative.dev/img/tiny_logo.png',
+  avatar:
+    'https://discovery-park.co.uk/wp-content/uploads/2017/06/avatar-default.png',
   name: 'Matilda Brown',
   email: 'ThisIsAnEmail@gmail.com',
   listFavorite: [
@@ -53,48 +64,93 @@ const defaultProps = {
 const ProfilePage: React.FC<Props> = (props) => {
   const {goBack, navigate} = useNavigation();
   const user = useSelector((state) => state.Auth.user);
+  const dispatch = useDispatch();
 
   const _renderItem = ({item, index}: {item: any; index: string}) => {
     return (
-      <View style={{ width: '100%'}}>
+      <View style={{flex: 1}}>
         <RecipeItem item={item} />
       </View>
     );
   };
 
+  const renderFloatingBtn = () => {
+    return (
+      <TouchableWithoutFeedback onPress={() => navigate('CreatePost')}>
+        <View style={styles.floatingBtn}>
+          <Feather name={'plus'} size={24 * ratio} color={'white'} />
+        </View>
+      </TouchableWithoutFeedback>
+    );
+  };
+
   return (
     <View style={styles.container}>
-      <CHeader
-       headerTitle='Trang cá nhân'
-       type={HEADER_TYPE.NORMAL}
-      />
-      <View style={{flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center', marginTop: 20 * ratio,}}>
-        <Image
-          style={{width: 70 * ratio, height: 70 * ratio, marginLeft: 25 * ratio,  borderRadius: 35 * ratio}}
-          source={{ uri: props.avatar, }}/>
-        <View style={{flexDirection: 'column', marginLeft: 15}}>
-          <CText bold style={{fontSize: 20}}>
-            {props.name}
-          </CText>
-          
-          <CText style={{fontSize: 15, color: 'grey'}}>
-            {props.email}
-          </CText>
+      <CHeader headerTitle="Trang cá nhân" type={HEADER_TYPE.NORMAL} />
+      <View style={styles.listWrap}>
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'flex-start',
+            alignItems: 'center',
+            marginTop: 20 * ratio,
+          }}>
+          <Image
+            style={{
+              width: 70 * ratio,
+              height: 70 * ratio,
+              marginLeft: 25 * ratio,
+              borderRadius: 35 * ratio,
+            }}
+            source={{
+              uri:
+                'https://discovery-park.co.uk/wp-content/uploads/2017/06/avatar-default.png',
+            }}
+          />
+          <View style={{flexDirection: 'column', marginLeft: 15 * ratio}}>
+            <CText bold style={{fontSize: 18 * ratio}}>
+              {user.name}
+            </CText>
 
-          <CText style={{fontSize: 18, color: 'gold'}}>
-            Chỉnh sửa thông tin cá nhân
-          </CText>
+            <CText style={{fontSize: 18 * ratio, color: 'grey'}}>
+              {user.email}
+            </CText>
+
+            <CText
+              style={{fontSize: 18 * ratio, color: 'gold'}}
+              onPress={() => {}}>
+              Chỉnh sửa thông tin cá nhân
+            </CText>
+            <TouchableOpacity
+              onPress={() => {
+                console.info('press');
+                dispatch(SignoutRequest.get());
+              }}>
+              <CText
+                style={{fontSize: 18 * ratio, color: COLOR.PRIMARY_ACTIVE}}>
+                Đăng xuất
+              </CText>
+            </TouchableOpacity>
+          </View>
         </View>
-      </View>
-      <CText bold  fontSize={22} style={{color: COLOR.PRIMARY_ACTIVE, paddingVertical: 20 * ratio, paddingLeft: 25 * ratio}}>
-       Công thức của bạn
-      </CText>
-      <FlatList
+        <CText
+          bold
+          fontSize={22}
+          style={{
+            color: COLOR.PRIMARY_ACTIVE,
+            paddingVertical: 20 * ratio,
+            paddingLeft: 25 * ratio,
+          }}>
+          Công thức của bạn
+        </CText>
+        <FlatList
           data={props.listFavorite}
           keyExtractor={(index) => index.toString()}
           renderItem={_renderItem}
           showsVerticalScrollIndicator={false}
         />
+      </View>
+      <View>{renderFloatingBtn()}</View>
     </View>
   );
 };
@@ -113,6 +169,24 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 24 * ratio,
     borderTopRightRadius: 24 * ratio,
     backgroundColor: 'white',
+  },
+  floatingBtn: {
+    position: 'absolute',
+    right: 16 * ratio,
+    bottom: 16 * ratio,
+    backgroundColor: COLOR.PRIMARY_ACTIVE,
+    width: 56 * ratio,
+    height: 56 * ratio,
+    borderRadius: 28 * ratio,
+    shadowColor: COLOR.PRIMARY_ACTIVE,
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
     alignItems: 'center',
-  }
+    justifyContent: 'center',
+  },
 });

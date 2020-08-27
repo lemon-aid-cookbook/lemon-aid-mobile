@@ -39,6 +39,7 @@ interface Props {
   onSubmitEditing?: any;
   onPressRightIcon?: any;
   textInputStyle?: StyleProp<TextStyle>;
+  rightIconColor: string;
 }
 
 interface States {
@@ -73,6 +74,7 @@ class TextInputScreen extends Component<Props, States> {
     onSubmitEditing: () => {},
     onPressRightIcon: () => {},
     textInputStyle: {},
+    rightIconColor: '#70777E'
   };
 
   textInput: any;
@@ -147,6 +149,7 @@ class TextInputScreen extends Component<Props, States> {
       rightIcon,
       onSubmitEditing,
       textInputStyle,
+      rightIconColor,
     } = this.props;
     return (
       <View style={this.props.containerStyle}>
@@ -185,10 +188,10 @@ class TextInputScreen extends Component<Props, States> {
                   },
                   textInputStyle,
                 ]}
+                autoCapitalize={'sentences'}
                 keyboardType={keyboardType}
                 onChangeText={this.onChangeText}
                 underlineColorAndroid={'transparent'}
-                autoCapitalize={'none'}
                 returnKeyType={'done'}
                 placeholder={placeholder}
                 placeholderTextColor={placeholderTextColor}
@@ -245,7 +248,7 @@ class TextInputScreen extends Component<Props, States> {
               <TouchableWithoutFeedback
                 onPress={this.onPressRightIcon}
                 style={styles.icon}>
-                <Feather name={rightIcon} size={20 * ratio} color={'#70777E'} />
+                <Feather name={rightIcon} size={20 * ratio} color={this.props.rightIconColor} />
               </TouchableWithoutFeedback>
             )}
           </View>

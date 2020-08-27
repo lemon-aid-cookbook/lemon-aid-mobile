@@ -60,7 +60,11 @@ const CameraPage: React.FC<Props> = (props) => {
           to: 'vi',
         }).then((result) => {
           const val = result.data[0];
-          console.info(val);
+          const value = val[0].toUpperCase() + val.substring(1)
+          GlobalModalSetup.getGlobalModalHolder().alertMessage(
+            'Món ăn',
+            value,
+          );
         });
       })
       .catch((er) => {
