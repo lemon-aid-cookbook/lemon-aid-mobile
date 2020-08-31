@@ -17,12 +17,12 @@ import {
   SignoutRequest,
 } from './actions';
 import {MODAL_TYPE} from 'config/themeUtils';
+import { GetProfile } from 'pages/Profile/redux/actions';
 
 const loginRequest$ = (action$: Observable<PlainAction>) =>
   action$.pipe(
     ofType(LoginRequest.type),
     exhaustMap((action: any) => {
-      console.log(action.payload);
       GlobalLoadingSetup.getLoading().isVisible();
       return request<any>({
         method: 'POST',
@@ -78,7 +78,11 @@ const signupRequest$ = (action$: Observable<PlainAction>) =>
                   }),
                 ),
             );
-            return SignupRequestSuccess.get(value.data);
+            return store.dispatch(
+              NavigationActions.navigate({
+                routeName: 'Login',
+              }),
+            )
           }
           return SignupRequestFailed.get(value.data);
         }),
@@ -109,7 +113,8 @@ const signupRequest$ = (action$: Observable<PlainAction>) =>
   const logInSuccess$ = (action$: Observable<PlainAction>) =>
   action$.pipe(
     ofType(LoginRequestSuccess.type),
-    map(() => {
+    map((action: any) => {
+      store.dispatch(GetProfile.get(action.payload.user.username))
       return store.dispatch(
         NavigationActions.navigate({
           routeName: 'Profile',

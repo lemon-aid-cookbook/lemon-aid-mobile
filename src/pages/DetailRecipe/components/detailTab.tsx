@@ -1,5 +1,5 @@
 import {CHeader, CText} from 'components';
-import {COLOR, HEADER_TYPE, ratio} from 'config/themeUtils';
+import {COLOR, HEADER_TYPE, ratio, TAB_TYPES} from 'config/themeUtils';
 import React, {useState} from 'react';
 import {
   Image,
@@ -11,6 +11,13 @@ import {
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import {useNavigation} from 'react-navigation-hooks';
+import {useSelector, useDispatch, shallowEqual} from 'react-redux';
+import {RNChipView} from 'react-native-chip-view';
+import {userInfo} from 'os';
+import { dispatch } from 'rxjs/internal/observable/pairs';
+import { UnlikePost, LikePost, Unfollow, Follow, GetFollowPost } from 'pages/Profile/redux/actions';
+import { store } from 'reduxs';
+
 export interface Props {
   detailRecipe: any;
 }
@@ -41,7 +48,11 @@ const defaultProps = {
 
 const DetailTab: React.FC<Props> = (props) => {
   const {goBack, navigate} = useNavigation();
-  const [isFavorite, setFavorite] = useState(false);
+  const detailPost = useSelector((state) => state.Profile.detailPost);
+  const followings = useSelector((state) => state.Profile.profileInfo?.followings)
+  const user = useSelector((state) => state.Auth.user);
+  const dispatch = useDispatch()
+
 
   const renderProfile = () => {
     return (
@@ -53,7 +64,7 @@ const DetailTab: React.FC<Props> = (props) => {
         }}>
         <Image
           source={{
-            uri: props.detailRecipe.ava,
+            uri: detailPost.author?.avatar,
           }}
           style={{
             width: 30 * ratio,
@@ -64,27 +75,59 @@ const DetailTab: React.FC<Props> = (props) => {
         />
         <View>
           <CText fontSize={14} color={COLOR.DEACTIVE_GRAY}>
-            {props.detailRecipe.name}
+            {detailPost.author?.username}
           </CText>
-          <TouchableOpacity activeOpacity={0.8}>
-            <CText fontSize={14} color={COLOR.PRIMARY_ACTIVE}>
-              Theo dõi
-            </CText>
-          </TouchableOpacity>
+          {user && detailPost.author?.username !== user?.username && (
+            <TouchableOpacity activeOpacity={0.8} onPress={() => handleFollow()}>
+              <CText fontSize={14} color={COLOR.PRIMARY_ACTIVE}>
+                {checkFollow() ? 'Đang theo dõi' : 'Theo dõi'}
+              </CText>
+            </TouchableOpacity>
+          )}
         </View>
       </View>
     );
   };
 
-  const renderCategory = () => {
+  const handleFollow = () => {
+    if (user) {
+      const val = {
+        userId: user.id,
+        limit: 10,
+        page: 1,
+        type: TAB_TYPES[2],
+        followerId: detailPost.userId
+      }
+      if (checkFollow() === true) {
+        dispatch(
+          Unfollow.get(val)
+        )
+      } else {
+        dispatch(Follow.get(val))
+      }
+    }
+  }
+
+  const renderInge = () => {
     return (
       <View style={{marginVertical: 9 * ratio}}>
         <CText fontSize={16} bold color={COLOR.PRIMARY_ACTIVE}>
           Nguyên liệu
         </CText>
-        {props.detailRecipe.category.length > 0 &&
-          props.detailRecipe.category.map((item: any) => {
-            return <CText fontSize={14}>{item}</CText>;
+        {detailPost.ingredients.length > 0 &&
+          detailPost.ingredients.map((item: any) => {
+            return (
+              <View
+                style={{
+                  flexDirection: 'row',
+                  flexWrap: 'wrap',
+                  marginLeft: 16 * ratio,
+                }}>
+                <CText fontSize={14} style={{flex: 1, textAlign: 'justify'}}>
+                  {item}
+                </CText>
+              </View>
+            );
           })}
       </View>
     );
@@ -96,8 +139,8 @@ const DetailTab: React.FC<Props> = (props) => {
         <CText fontSize={16} bold color={COLOR.PRIMARY_ACTIVE}>
           Các bước thực hiện
         </CText>
-        {props.detailRecipe.steps.length > 0 &&
-          props.detailRecipe.steps.map((item: any, index: number) => {
+        {detailPost.content.length > 0 &&
+          detailPost.content.map((item: any, index: number) => {
             return (
               <View style={{flex: 1, paddingVertical: 5 * ratio}}>
                 <View
@@ -117,13 +160,13 @@ const DetailTab: React.FC<Props> = (props) => {
                       <CText
                         fontSize={14}
                         style={{flex: 1, textAlign: 'justify'}}>
-                        {item.description}
+                        {item.making}
                       </CText>
                     </View>
-                    {item.img && (
+                    {item.image && (
                       <Image
                         source={{
-                          uri: item.img,
+                          uri: item.image,
                         }}
                         style={{
                           width: '100%',
@@ -142,8 +185,68 @@ const DetailTab: React.FC<Props> = (props) => {
     );
   };
 
+  const renderCategory = () => {
+    return (
+      <View style={{marginTop: 9 * ratio}}>
+        <CText fontSize={16} bold color={COLOR.PRIMARY_ACTIVE}>
+          Nhóm thức ăn
+        </CText>
+        <View style={{flexDirection: 'row'}}>
+          {detailPost.ingredients.length > 0 &&
+            detailPost.categories.map((item: any) => {
+              return (
+                <View
+                  style={{marginHorizontal: 8 * ratio, marginTop: 6 * ratio}}>
+                  {item.length > 0 && <RNChipView
+                    title={item}
+                    avatar={false}
+                    titleStyle={{
+                      fontSize: 14 * ratio,
+                      color: 'white',
+                      fontFamily: 'Cabin-Regular',
+                      fontWeight: 'normal',
+                    }}
+                    backgroundColor={COLOR.PRIMARY_ACTIVE}
+                  />}
+                </View>
+              );
+            })}
+        </View>
+      </View>
+    );
+  };
+
+  const checkFavorite = () => {
+    if (user && detailPost.likes.find(item => item.user.username === user?.username)){
+      return true
+    } else {
+      return false
+    }
+  }
+
+  const checkFollow = () => {
+    if (user && followings.find(item => item.user.username === detailPost?.author.username)){
+      return true
+    } else {
+      return false
+    }
+  }
+
+  const onTouchFav = () => {
+    if (user) {
+    const val = {
+      userId: user.id,
+      postId: detailPost.id,
+      limit: 10,
+      page: 1,
+      type: TAB_TYPES[1]
+    }
+      checkFavorite() === true ? dispatch(UnlikePost.get(val)) : dispatch(LikePost.get(val))
+    }
+  }
+
   return (
-    <View style={styles.container}>
+    <View style={styles.container} key={detailPost.likes}>
       <ScrollView
         contentContainerStyle={{marginBottom: 16 * ratio}}
         style={styles.listWrap}
@@ -151,7 +254,7 @@ const DetailTab: React.FC<Props> = (props) => {
         <View>
           <Image
             source={{
-              uri: props.detailRecipe.icon,
+              uri: detailPost.avatar,
             }}
             style={{
               width: '100%',
@@ -160,21 +263,27 @@ const DetailTab: React.FC<Props> = (props) => {
             }}
           />
 
-          <TouchableWithoutFeedback onPress={() => setFavorite(!isFavorite)}>
+          <TouchableWithoutFeedback onPress={() => {onTouchFav()}}>
             <View style={styles.favoriteWrap}>
               <AntDesign
-                name={isFavorite ? 'heart' : 'hearto'}
+                name={checkFavorite() ? 'heart' : 'hearto'}
                 color={COLOR.PRIMARY_ACTIVE}
                 size={24 * ratio}
               />
             </View>
           </TouchableWithoutFeedback>
         </View>
-        <View  style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 5 * ratio}}>
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            marginTop: 5 * ratio,
+          }}>
           <CText fontSize={20} bold>
-            {props.detailRecipe.title}
+            {detailPost.title}
           </CText>
-          <View style={{ flexDirection: 'row', alignItems: 'center',}}>
+          <View style={{flexDirection: 'row', alignItems: 'center'}}>
             <AntDesign
               name={'heart'}
               color={COLOR.PRIMARY_ACTIVE}
@@ -182,20 +291,54 @@ const DetailTab: React.FC<Props> = (props) => {
               style={{marginRight: 8 * ratio}}
             />
             <CText fontSize={14} bold>
-            {props.detailRecipe.favNum}
+              {detailPost.likes.length}
             </CText>
           </View>
         </View>
         {renderProfile()}
-        <CText fontSize={14} color={COLOR.DEACTIVE_GRAY}>
-          Thời gian chuẩn bị: {props.detailRecipe.time / 60} phút
-        </CText>
-        <CText fontSize={14} color={COLOR.DEACTIVE_GRAY}>
-          Nấu cho: {props.detailRecipe.ration} người
-        </CText>
+        <View style={{flexDirection: 'row', alignItems: 'center'}}>
+          <CText
+            fontSize={14}
+            bold
+            color={'black'}
+            style={{marginRight: 3 * ratio}}>
+            Thời gian:
+          </CText>
+          <CText fontSize={14} color={'black'}>
+            {detailPost.cookingTime} phút
+          </CText>
+        </View>
+        <View style={{flexDirection: 'row', alignItems: 'center'}}>
+          <CText
+            fontSize={14}
+            bold
+            color={'black'}
+            style={{marginRight: 3 * ratio}}>
+            Khẩu phần:
+          </CText>
+          <CText fontSize={14} color={'black'}>
+          {detailPost.ration || 1} người
+          </CText>
+        </View>
+        <View style={{flexDirection: 'row', alignItems: 'center'}}>
+          <CText
+            fontSize={14}
+            bold
+            color={'black'}
+            style={{marginRight: 3 * ratio}}>
+             Độ khó:
+          </CText>
+          <CText fontSize={14} color={'black'}>
+          {detailPost.difficultLevel === 1
+            ? 'Dễ'
+            : detailPost.difficultLevel === 2
+            ? 'Trung bình'
+            : 'Khó'}
+          </CText>
+        </View>
         {renderCategory()}
+        {renderInge()}
         {renderStep()}
-
       </ScrollView>
     </View>
   );

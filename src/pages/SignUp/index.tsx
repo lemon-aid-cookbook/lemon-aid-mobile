@@ -37,16 +37,6 @@ const validationSchema = yup.object().shape({
       [yup.ref('password'), null],
       'Mật khẩu nhập lại phải khớp với mật khẩu đã nhập',
     ),
-  name: yup
-    .string()
-    .trim()
-    .required('* Vui lòng nhập họ và tên')
-    .matches(
-      /[^a-z0-9A-Z_ÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂưăạảấầẩẫậắằẳẵặẹẻẽềềểỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪễệỉịọỏốồổỗộớờởỡợụủứừỬỮỰỲỴÝỶỸửữựỳỵỷỹ]/u,
-      {
-        message: 'Họ tên không hợp lệ',
-      },
-    ),
   username: yup.string().trim().required('* Vui lòng nhập tên đăng nhập'),
 });
 
@@ -73,7 +63,6 @@ const SignUpPage: React.FC<Props> = (props) => {
           initialValues={{
             email: '',
             password: '',
-            name: '',
             confirmPassword: '',
             username: '',
           }}
@@ -93,19 +82,6 @@ const SignUpPage: React.FC<Props> = (props) => {
             return (
               <View
                 style={{marginTop: 28 * ratio, marginHorizontal: 16 * ratio}}>
-                <AnimatedInput
-                  placeholder="Tên"
-                  onTouchStart={() => setFieldTouched('name')}
-                  onChangeText={handleChange('name')}
-                  onBlur={handleBlur('name')}
-                  value={values.name}
-                  returnKeyType={'next'}
-                  onSubmitEditing={() => {
-                    focusTheField('username');
-                  }}
-                  textError={errors.name}
-                  textSize={16}
-                />
                 <AnimatedInput
                   placeholder="Tên đăng nhập"
                   style={styles.input}

@@ -4,6 +4,7 @@ import { from, Observable } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
 import { log as SysLog } from 'utils/function';
 import { Header, Response } from './model';
+import {store} from 'reduxs/index'
 
 const headers = new Header();
 
@@ -17,9 +18,12 @@ export function request(param) {
   
     const language = 'vi';
     const parameters = param.param;
+    const token = store.getState().Auth.token
+
     headers.setHeader({ 
       'Content-Type': 'application/json',
-      'Accept-Language': language });
+      'Accept-Language': language,
+      Authorization: token });
   
     return from(
       axios.request({

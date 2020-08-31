@@ -1,11 +1,13 @@
 import {CText, CButton, CHeader} from 'components';
-import React from 'react';
+import React, { useEffect } from 'react';
 import {StyleSheet, View, FlatList} from 'react-native';
 import {useNavigation} from 'react-navigation-hooks';
-import {useSelector} from 'react-redux';
-import {ratio, HEADER_TYPE} from 'config/themeUtils';
+import {useSelector, useDispatch} from 'react-redux';
+import {ratio, HEADER_TYPE, TAB_TYPES} from 'config/themeUtils';
 import RecipeItem from 'pages/Search/components/recipeItem';
 import {TouchableOpacity} from 'react-native-gesture-handler';
+import { GetFavoritePost, GetDetailPost } from 'pages/Profile/redux/actions';
+import EmptyList from 'pages/Search/components/emptyList';
 export interface Props {
   listFavorite: any[];
 }
@@ -48,16 +50,33 @@ const defaultProps = {
 const FavoritePage: React.FC<Props> = (props) => {
   const {goBack, navigate} = useNavigation();
   const user = useSelector((state) => state.Auth.user);
+  const favPost = useSelector((state) => state.Profile.favPost);
+  const dispatch = useDispatch();
+  
+  useEffect(() => {
+    if (user) {
+      dispatch(GetFavoritePost.get({
+        userId: user.id,
+        limit: 10,
+        page: 1,
+        type: TAB_TYPES[1]
+      }))
+    }
+
+  }, [])
 
   const _renderItem = ({item, index}: {item: any; index: string}) => {
     return (
       <View style={{width: '100%'}}>
         <TouchableOpacity
-          onPress={() => {
-            console.info();
-          }}>
+        activeOpacity={0.8}
+        onPress={() => {
+          dispatch(GetDetailPost.get({ postId: item.id }))
+        }}>
+        <View style={{width: '100%'}}>
           <RecipeItem item={item} />
-        </TouchableOpacity>
+        </View>
+      </TouchableOpacity>
       </View>
     );
   };
@@ -86,7 +105,7 @@ const FavoritePage: React.FC<Props> = (props) => {
       <CHeader type={HEADER_TYPE.NORMAL} headerTitle={'Yêu thích'} />
       <View style={styles.listWrap}>
         <FlatList
-          data={props.listFavorite}
+          data={favPost}
           keyExtractor={(index) => index.toString()}
           renderItem={_renderItem}
           showsVerticalScrollIndicator={false}

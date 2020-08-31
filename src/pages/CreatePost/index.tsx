@@ -1,20 +1,27 @@
-import {CHeader, CText, CInput, CButton} from 'components';
-import {COLOR, HEADER_TYPE, ratio} from 'config/themeUtils';
-import {SignoutRequest} from 'pages/Login/redux/actions';
-import RecipeItem from 'pages/Search/components/recipeItem';
-import React, {useState} from 'react';
+import { CButton, CHeader, CInput, CText } from 'components';
+import {
+  CATEGORIES,
+  COLOR,
+  HEADER_TYPE,
+  ratio,
+  validationRecipeSchema
+} from 'config/themeUtils';
+import { Formik } from 'formik';
+import React from 'react';
 import {
   FlatList,
-  Image,
+
   StyleSheet,
   TouchableWithoutFeedback,
-  View,
+  View
 } from 'react-native';
+import { RNChipView } from 'react-native-chip-view';
+import DropDownPicker from 'react-native-dropdown-picker';
+import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
 import Feather from 'react-native-vector-icons/Feather';
-import {useNavigation} from 'react-navigation-hooks';
-import {useDispatch, useSelector} from 'react-redux';
-import {TouchableOpacity, ScrollView} from 'react-native-gesture-handler';
-import ImagePicker from 'react-native-image-picker';
+import { useNavigation } from 'react-navigation-hooks';
+import { useDispatch, useSelector } from 'react-redux';
+import ImageUpload from './imagePicker';
 
 export interface Props {
   avatar: string;
@@ -22,350 +29,54 @@ export interface Props {
 
 const defaultProps = {};
 
+const difficultLevel = [
+  {
+    value: 1,
+    label: 'Dễ',
+  },
+  {
+    value: 2,
+    label: 'Trung bình',
+  },
+  {
+    value: 3,
+    label: 'Khó',
+  },
+];
+
 const CreatePostPage: React.FC<Props> = (props) => {
   const {goBack, navigate} = useNavigation();
   const user = useSelector((state) => state.Auth.user);
   const dispatch = useDispatch();
-  const [thumbnail, setThumbnail] = useState('');
-  const [title, setTitle] = useState('');
-  const [descript, setDescript] = useState('');
-  const [cookingTime, setTime] = useState(0);
-  const [ration, setRation] = useState(0);
-  const [steps, setSteps] = useState([{stt: 1, making: '', image: ''}]);
-  const [ingredient, setIngredient] = useState(['']);
-  const [checkValid, setValid] = useState(false);
 
-  const insertThubnail = () => {
-    ImagePicker.showImagePicker(
-      {
-        maxWidth: 512,
-      },
-      (result) => !result.didCancel && setThumbnail(result.data),
-    );
+
+  const submitRecipe = (values: any) => {
+    console.info('value', values);
+    // dispatch(
+    //   CreateRecipe.get({
+    //     ...values,
+    //     ingredients: values.ingredients.join('|'),
+    //     categories: values.categories.join('|'),
+    //     userId: user?.id,
+    //     ration: values.ration.toString()
+    //   })
+    // )
   };
 
-  const renderThumbnail = () => {
-    return (
-      <View>
-        <TouchableOpacity
-          activeOpacity={0.7}
-          style={{
-            backgroundColor: COLOR.LIGHT_GRAY,
-            borderRadius: 9 * ratio,
-            width: '100%',
-            height: 200 * ratio,
-            marginVertical: 16 * ratio,
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-          onPress={() => {
-            insertThubnail();
-          }}>
-          {thumbnail.length > 0 ? (
-            <Image
-              source={{
-                uri: `data:image/jpeg;base64,${thumbnail}`,
-              }}
-              style={{
-                width: '100%',
-                height: 200 * ratio,
-                borderRadius: 9 * ratio,
-              }}
-            />
-          ) : (
-            <Feather
-              name={'image'}
-              color={COLOR.DEACTIVE_GRAY}
-              size={46 * ratio}
-            />
-          )}
-        </TouchableOpacity>
-      </View>
-    );
-  };
-
-  const renderTitle = () => {
-    return (
-      <View>
-        <CText bold fontSize={18}>
-          Tiêu đề
-        </CText>
-        <CInput
-          placeholder={'Gỏi...'}
-          textSize={14}
-          value={title}
-          onChangeText={(text: string) => setTitle(text)}
-          style={styles.inputWrap}
-          textError={
-            checkValid &&
-            title.replace(/\s/g, '').length < 1 &&
-            'Không được bỏ trống!'
-          }
-        />
-        <CText bold fontSize={18}>
-          Mô tả
-        </CText>
-        <CInput
-          placeholder={'Món ăn dành cho mùa hè...'}
-          textSize={14}
-          value={descript}
-          onChangeText={(text: string) => setDescript(text)}
-          style={styles.inputWrap}
-        />
-        <CText bold fontSize={18}>
-          Khẩu phần
-        </CText>
-        <CInput
-          placeholder={'4'}
-          textSize={14}
-          value={ration.toString()}
-          onChangeText={(text: string) => setRation(Number(text))}
-          style={styles.inputWrap}
-          keyboardType={'number-pad'}
-          textError={
-            checkValid &&
-            ration.toString().replace(/\s/g, '').length < 1 &&
-            'Không được bỏ trống!'
-          }
-        />
-        <CText bold fontSize={18}>
-          Thời gian nấu
-        </CText>
-        <View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-          }}>
-          <CInput
-            containerStyle={{flex: 1, justifyContent: 'center'}}
-            placeholder={'20'}
-            textSize={14}
-            value={cookingTime.toString()}
-            onChangeText={(text: string) => setTime(Number(text))}
-            style={[styles.inputWrap, {width: '90%'}]}
-            keyboardType={'number-pad'}
-            textError={
-              checkValid &&
-              cookingTime.toString().replace(/\s/g, '').length < 1 &&
-              'Không được bỏ trống!'
-            }
-          />
-          <CText bold fontSize={14}>
-            phút
-          </CText>
-        </View>
-      </View>
-    );
-  };
-
-  const renderIngreItem = ({item, index}: {item: string; index: number}) => {
-    return (
-      <View
-        style={{
-          flex: 1,
-          flexDirection: 'row',
-          width: '100%',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-        }}
-        key={index}>
-        <CInput
-          containerStyle={{flex: 1, justifyContent: 'center'}}
-          placeholder={'100g thịt ba chỉ...'}
-          textSize={14}
-          value={item}
-          onChangeText={(text: string) => {
-            const ingre = ingredient;
-            ingre[index] = text;
-            setIngredient(ingre);
-          }}
-          style={[styles.inputWrap, {width: '90%'}]}
-        />
-        <TouchableWithoutFeedback
-          onPress={() => {
-            setIngredient([
-              ...ingredient.slice(0, index),
-              ...ingredient.slice(index + 1),
-            ]);
-          }}>
-          <Feather name={'x'} size={24 * ratio} color={'#9B9B9B'} />
-        </TouchableWithoutFeedback>
-      </View>
-    );
-  };
-
-  const renderIngre = () => {
-    return (
-      <View style={{marginBottom: 16 * ratio}}>
-        <CText bold fontSize={18}>
-          Nguyên liệu
-        </CText>
-        <FlatList
-          data={ingredient}
-          keyExtractor={(index) => index.toString()}
-          renderItem={renderIngreItem}
-        />
-        <TouchableOpacity
-          onPress={() => {
-            setIngredient([...ingredient, '']);
-            console.info(ingredient);
-          }}>
-          <CText bold fontSize={14} color={COLOR.PRIMARY_ACTIVE}>
-            {' '}
-            + Thêm nguyên liệu
-          </CText>
-        </TouchableOpacity>
-      </View>
-    );
-  };
-
-  const renderStep = ({item, index}) => {
-    return (
-      <View
-        style={{
-          flex: 1,
-          flexDirection: 'row',
-          width: '100%',
-          alignItems: 'flex-start',
-          justifyContent: 'space-between',
-          marginVertical: 10 * ratio,
-        }}
-        key={Math.random()}>
-        <View style={styles.index}>
-          <CText fontSize={14} color={'white'} bold>
-            {index + 1}
-          </CText>
-        </View>
-        <View style={{width: '80%'}}>
-          <CInput
-            containerStyle={{flex: 1, justifyContent: 'center'}}
-            placeholder={'Sơ chế thịt...'}
-            textSize={14}
-            value={item.making}
-            onChangeText={(text: string) => {
-              const step = steps;
-              step[index].making = text;
-              step[index].stt = index + 1;
-              setSteps(step);
-            }}
-            style={[styles.inputWrap, {width: '90 %'}]}
-          />
-          <TouchableOpacity
-            style={{
-              backgroundColor: '#DADADA',
-              width: 100 * ratio,
-              height: 100 * ratio,
-              borderRadius: 9 * ratio,
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-            onPress={() => pickStepImage(index)}>
-            {item.image !== '' ? (
-              <View>
-                <Image
-                  source={{
-                    uri: `data:image/jpeg;base64,${item.image}`,
-                  }}
-                  style={{
-                    width: 100 * ratio,
-                    height: 100 * ratio,
-                    borderRadius: 9 * ratio,
-                  }}
-                />
-              </View>
-            ) : (
-              <Feather
-                name={'image'}
-                color={COLOR.DEACTIVE_GRAY}
-                size={24 * ratio}
-              />
-            )}
-          </TouchableOpacity>
-        </View>
-        <TouchableOpacity
-          style={{marginTop: 16 * ratio}}
-          onPress={() => {
-            setSteps([...steps.slice(0, index), ...steps.slice(index + 1)]);
-          }}>
-          <Feather name={'x'} size={24 * ratio} color={'#9B9B9B'} />
-        </TouchableOpacity>
-      </View>
-    );
-  };
-
-  const pickStepImage = (index: number) => {
-    ImagePicker.showImagePicker(
-      {
-        maxWidth: 512,
-      },
-      (result) => {
-        if (!result.didCancel) {
-          const step = steps;
-          step[index].image = result.data;
-          setSteps(step);
-          console.info(steps)
-        }
-      },
-    );
-  };
-
-  const renderSteps = () => {
-    return (
-      <View style={{marginBottom: 16 * ratio}}>
-        <CText bold fontSize={18}>
-          Các bước thực hiện
-        </CText>
-        <FlatList
-          data={steps}
-          keyExtractor={(index) => index.toString()}
-          renderItem={renderStep}
-        />
-        <TouchableOpacity
-          onPress={() => {
-            setSteps([...steps, {stt: steps.length, making: '', image: ''}]);
-          }}>
-          <CText bold fontSize={14} color={COLOR.PRIMARY_ACTIVE}>
-            {' '}
-            + Thêm bước
-          </CText>
-        </TouchableOpacity>
-      </View>
-    );
-  };
-
-  const checkSubmit = () => {
-    if (
-      thumbnail.length > 0 &&
-      title.toString().replace(/\s/g, '').length > 0 &&
-      ration.toString().replace(/\s/g, '').length > 0 &&
-      cookingTime.toString().replace(/\s/g, '').length > 0 &&
-      ingredient[0].toString().replace(/\s/g, '').length > 0 &&
-      steps[0].making.toString().replace(/\s/g, '').length > 0
-    ) {
-      return true;
+  const onChangeCategories = (item, isIn, ingres, setFieldValue) => {
+    if (isIn > -1) {
+      ingres.splice(isIn, 1);
     } else {
-      return false;
+      ingres.push(item.title);
     }
+    setFieldValue('categories', ingres);
   };
 
-  const handleSubmit = () => {
-    const val = {
-      title: title,
-      description: descript,
-      ration: ration.toString() + ' người ăn',
-      cookingTime: cookingTime,
-      difficultLevel: 1,
-      url: '',
-      avatar: thumbnail,
-      steps: steps,
-      ingredients: ingredient.join("|"),
-      categories: '',
-      hashtags: '',
-      userId: user.id,
-    };
-    return JSON.stringify(val);
+  const addPictureStep = (steps, index, picture, setFieldValue) => {
+    steps[index].image = picture;
+    setFieldValue('steps', steps);
   };
+  
 
   return (
     <View style={styles.container}>
@@ -376,18 +87,326 @@ const CreatePostPage: React.FC<Props> = (props) => {
         onLeftPress={() => goBack()}
       />
       <ScrollView style={styles.listWrap} showsVerticalScrollIndicator={false}>
-        {renderThumbnail()}
-        {renderTitle()}
-        {renderIngre()}
-        {renderSteps()}
-        <CButton
-          style={[styles.btnStyle]}
-          title="Đăng"
-          onPress={() => {
-            setValid(true);
-            checkSubmit() && console.info(handleSubmit());
+        <Formik
+          initialValues={{
+            title: '',
+            description: '',
+            avatar: null,
+            ration: '1',
+            cookingTime: 20,
+            difficultLevel: 'Dễ',
+            ingredients: [''],
+            categories: [],
+            hashtags: '',
+            steps: [{stt: 1, making: '', image: null}],
           }}
-        />
+          isInitialValid={false}
+          validationSchema={validationRecipeSchema}
+          onSubmit={(values) => {
+            console.info('balu', values);
+          }}>
+          {({
+            handleChange,
+            handleBlur,
+            handleSubmit,
+            values,
+            isValid,
+            errors,
+            touched,
+            setFieldTouched,
+            setFieldValue,
+          }) => {
+            return (
+              <View
+                style={{marginTop: 28 * ratio, marginHorizontal: 16 * ratio}}>
+                <View>
+                  <ImageUpload
+                    type={'BIG'}
+                    onChange={() => handleChange('avatar')}
+                  />
+                </View>
+                <View>
+                  <CText bold fontSize={18}>
+                    Tiêu đề
+                  </CText>
+                  <CInput
+                    placeholder={'Gỏi...'}
+                    textSize={14}
+                    value={values.title}
+                    onChangeText={handleChange('title')}
+                    style={styles.inputWrap}
+                    textError={errors.title}
+                  />
+                  <CText bold fontSize={18}>
+                    Mô tả
+                  </CText>
+                  <CInput
+                    placeholder={'Món ăn dành cho mùa hè...'}
+                    textSize={14}
+                    value={values.description}
+                    onChangeText={handleChange('description')}
+                    style={styles.inputWrap}
+                  />
+                  <CText bold fontSize={18}>
+                    Thời gian nấu
+                  </CText>
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                    }}>
+                    <CInput
+                      containerStyle={{flex: 1, justifyContent: 'center'}}
+                      placeholder={'20'}
+                      textSize={14}
+                      value={Number(values.cookingTime)}
+                      onChangeText={handleChange('cookingTime')}
+                      style={[styles.inputWrap, {width: '90%'}]}
+                      keyboardType={'number-pad'}
+                      textError={errors.cookingTime}
+                    />
+                    <CText bold fontSize={14}>
+                      phút
+                    </CText>
+                  </View>
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                    }}>
+                    <View>
+                      <CText bold fontSize={18}>
+                        Khẩu phần
+                      </CText>
+                      <View
+                        style={{flexDirection: 'row', alignItems: 'center'}}>
+                        <CInput
+                          placeholder={'4'}
+                          textSize={14}
+                          value={Number(values.ration) ? values.ration : ''}
+                          onChangeText={handleChange('ration')}
+                          style={[
+                            styles.inputWrap,
+                            {
+                              width: 90 * ratio,
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                            },
+                          ]}
+                          keyboardType={'number-pad'}
+                          textError={errors.ration}
+                        />
+                      </View>
+                    </View>
+                    <View>
+                      <CText bold fontSize={18}>
+                        Độ khó
+                      </CText>
+                      <DropDownPicker
+                        items={difficultLevel}
+                        containerStyle={styles.dropdownWrap}
+                        onChangeItem={(item) =>
+                          handleChange('difficultLevel')(item.label)
+                        }
+                      />
+                    </View>
+                  </View>
+
+                  <CText bold fontSize={18}>
+                    Nhóm thức ăn
+                  </CText>
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                    }}>
+                    <FlatList
+                      horizontal
+                      data={CATEGORIES}
+                      showsHorizontalScrollIndicator={false}
+                      renderItem={({item, index}) => {
+                        const isIn = values.categories.indexOf(item.title);
+                        return (
+                          <View style={{marginRight: 5 * ratio}}>
+                            <RNChipView
+                              key={`chip${index}`}
+                              title={item.title}
+                              avatar={false}
+                              titleStyle={{
+                                fontSize: 14 * ratio,
+                                color: 'white',
+                                fontFamily: 'Cabin-Regular',
+                                fontWeight: 'normal',
+                              }}
+                              backgroundColor={
+                                isIn > -1
+                                  ? COLOR.PRIMARY_ACTIVE
+                                  : COLOR.DEACTIVE_GRAY
+                              }
+                              onPress={() =>
+                                onChangeCategories(
+                                  item,
+                                  isIn,
+                                  values.categories,
+                                  setFieldValue,
+                                )
+                              }
+                            />
+                          </View>
+                        );
+                      }}
+                    />
+                  </View>
+                  <View style={{marginBottom: 16 * ratio}}>
+                    <CText bold fontSize={18}>
+                      Nguyên liệu
+                    </CText>
+                    {values.ingredients.length > 0 &&
+                      values.ingredients.map((material, index) => (
+                        <View
+                          style={{
+                            flex: 1,
+                            flexDirection: 'row',
+                            width: '100%',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                          }}
+                          key={index}>
+                          <CInput
+                            containerStyle={{flex: 1, justifyContent: 'center'}}
+                            placeholder={'100g thịt ba chỉ...'}
+                            textSize={14}
+                            value={material}
+                            onChangeText={(text: string) => {
+                              let ingres = values.ingredients;
+                              ingres[index] = text;
+                              setFieldValue('ingredients', ingres);
+                            }}
+                            style={[styles.inputWrap, {width: '90%'}]}
+                           
+                          />
+                          <TouchableWithoutFeedback
+                            onPress={() => {
+                              let ingres = values.ingredients;
+                              ingres.splice(index, 1);
+                              setFieldValue('ingredients', ingres);
+                            }}>
+                            <Feather
+                              name={'x'}
+                              size={24 * ratio}
+                              color={'#9B9B9B'}
+                            />
+                          </TouchableWithoutFeedback>
+                        </View>
+                      ))}
+                    <TouchableOpacity
+                      onPress={() => {
+                        let ingres = values.ingredients;
+                        ingres.push('');
+                        setFieldValue('ingredients', ingres);
+                      }}>
+                      <CText bold fontSize={14} color={COLOR.PRIMARY_ACTIVE}>
+                        {' '}
+                        + Thêm nguyên liệu
+                      </CText>
+                    </TouchableOpacity>
+                  </View>
+                  <View style={{marginBottom: 16 * ratio}}>
+                    <CText bold fontSize={18}>
+                      Các bước thực hiện
+                    </CText>
+                    {values.steps.length > 0 &&
+                      values.steps.map((step, i) => (
+                        <View
+                          style={{
+                            flex: 1,
+                            flexDirection: 'row',
+                            width: '100%',
+                            alignItems: 'flex-start',
+                            justifyContent: 'space-between',
+                            marginVertical: 10 * ratio,
+                          }}
+                          key={Math.random()}>
+                          <View style={styles.index}>
+                            <CText fontSize={14} color={'white'} bold>
+                              {i + 1}
+                            </CText>
+                          </View>
+                          <View style={{width: '80%'}}>
+                            <CInput
+                              containerStyle={{
+                                flex: 1,
+                                justifyContent: 'center',
+                              }}
+                              placeholder={'Sơ chế thịt...'}
+                              textSize={14}
+                              value={step.making}
+                              onChangeText={(text: string) => {
+                                let steps = values.steps;
+                                steps[i].making = text;
+                                handleChange('steps')(steps)
+                                // setFieldValue('steps', steps);
+                              }}
+                              style={[styles.inputWrap, {width: '90 %'}]}
+                              // textError={errors.steps[i]?.making || ''}
+                            />
+                            <ImageUpload
+                              type={'SMALL'}
+                              onChange={(data) =>
+                                addPictureStep(
+                                  values.steps,
+                                  i,
+                                  data,
+                                  setFieldValue,
+                                )
+                              }
+                            />
+                          </View>
+                          <TouchableOpacity
+                            style={{marginTop: 16 * ratio}}
+                            onPress={() => {
+                              let steps = values.steps;
+                              steps.splice(i, 1);
+                              setFieldValue('steps', steps);
+                            }}>
+                            <Feather
+                              name={'x'}
+                              size={24 * ratio}
+                              color={'#9B9B9B'}
+                            />
+                          </TouchableOpacity>
+                        </View>
+                      ))}
+                    <TouchableOpacity
+                      onPress={() => {
+                        // let steps = values.steps;
+                        // steps.push({
+                        //   stt: values.steps.length + 1,
+                        //   making: '',
+                        // });
+                        // setFieldValue('steps', steps);
+                      }}>
+                      <CText bold fontSize={14} color={COLOR.PRIMARY_ACTIVE}>
+                        {' '}
+                        + Thêm bước
+                      </CText>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+                <CButton
+                  style={[styles.btnStyle]}
+                  title="Đăng"
+                  onPress={() => {
+                    console.info(values);
+                  }}
+                />
+              </View>
+            );
+          }}
+        </Formik>
       </ScrollView>
     </View>
   );
@@ -439,5 +458,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginVertical: 20 * ratio,
+  },
+  pressWrap: {
+    borderRadius: 9 * ratio,
+    borderWidth: 1 * ratio,
+    borderColor: '#DADADA',
+    width: 45 * ratio,
+    height: 45 * ratio,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  dropdownWrap: {
+    width: 200 * ratio,
+    height: 45 * ratio,
+    marginVertical: 8 * ratio,
+    borderRadius: 9 * ratio,
   },
 });

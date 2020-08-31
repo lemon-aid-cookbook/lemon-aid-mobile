@@ -27,7 +27,7 @@ const RecipeItem: React.FC<Props> = (props) => {
       <View style={styles.cardItem}>
         <Image
           source={{
-            uri: props.item.icon,
+            uri: props.item.avatar,
           }}
           style={{
             width: '100%',
@@ -50,7 +50,7 @@ const RecipeItem: React.FC<Props> = (props) => {
               color={COLOR.DEACTIVE_GRAY}
               style={{marginRight: 8 * ratio}}
             />
-            <CText color={COLOR.DEACTIVE_GRAY}>{props.item.time / 60} phút</CText>
+            <CText color={COLOR.DEACTIVE_GRAY}>{props.item.cookingTime} phút</CText>
           </View>
           <View style={{flexDirection: 'row', alignItems: 'center'}}>
             <AntDesign
@@ -59,13 +59,13 @@ const RecipeItem: React.FC<Props> = (props) => {
               color={COLOR.PRIMARY_ACTIVE}
               style={{marginRight: 8 * ratio}}
             />
-            <CText bold>{props.item.favCount}</CText>
+            <CText bold>{props.item.numberOfLikes  || 0}</CText>
           </View>
         </View>
         <View style={{flexDirection: 'row', alignItems: 'center', marginTop: 8 * ratio}}>
           <Image
             source={{
-              uri: props.item.ava,
+              uri: props.item.User ? props.item.User.avatar : props.item.userAvar,
             }}
             style={{
               width: 30 * ratio,
@@ -79,7 +79,7 @@ const RecipeItem: React.FC<Props> = (props) => {
               {props.item.title}
             </CText>
             <CText bold fontSize={12} color={COLOR.DEACTIVE_GRAY}>
-              {props.item.userName}
+              {props.item.User ? props.item.User.username : props.item.username}
             </CText>
           </View>
         </View>

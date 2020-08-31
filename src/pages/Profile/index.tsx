@@ -2,7 +2,7 @@ import {CHeader, CText} from 'components';
 import {COLOR, HEADER_TYPE, ratio} from 'config/themeUtils';
 import {SignoutRequest} from 'pages/Login/redux/actions';
 import RecipeItem from 'pages/Search/components/recipeItem';
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   FlatList,
   Image,
@@ -14,6 +14,9 @@ import Feather from 'react-native-vector-icons/Feather';
 import {useNavigation} from 'react-navigation-hooks';
 import {useDispatch, useSelector} from 'react-redux';
 import {TouchableOpacity} from 'react-native-gesture-handler';
+import EmptyList from 'pages/Search/components/emptyList';
+import { GetProfile, GetDetailPost, UpdateInfo } from './redux/actions';
+import ImagePicker from 'react-native-image-picker';
 
 export interface Props {
   avatar: string;
@@ -64,13 +67,21 @@ const defaultProps = {
 const ProfilePage: React.FC<Props> = (props) => {
   const {goBack, navigate} = useNavigation();
   const user = useSelector((state) => state.Auth.user);
+  const profileInfo = useSelector((state) => state.Profile.profileInfo);
   const dispatch = useDispatch();
 
+  useEffect(() => {
+    if (user) {
+      dispatch(GetProfile.get(user.username))
+    }
+  }, [])
+
   const _renderItem = ({item, index}: {item: any; index: string}) => {
+    const recipe = {...item, userAvar: user.avatar , username: user.username}
     return (
-      <View style={{flex: 1}}>
-        <RecipeItem item={item} />
-      </View>
+      <TouchableOpacity activeOpacity={0.9} onPress={() => dispatch(GetDetailPost.get({ postId: item.id}))} style={{flex: 1}}>
+        <RecipeItem item={recipe} />
+      </TouchableOpacity>
     );
   };
 
@@ -84,6 +95,23 @@ const ProfilePage: React.FC<Props> = (props) => {
     );
   };
 
+  const updateAva = () => {
+    ImagePicker.showImagePicker(
+      {
+        maxWidth: 512,
+      },
+      (result) => !result.didCancel && setAva(result.data),
+    );
+  }
+
+  const setAva = (data: any) => {
+    dispatch(UpdateInfo.get({
+      userId: user.id,
+      data: { avatar: 'data:image/png;base64,' + data },
+    })
+  )
+  }
+
   return (
     <View style={styles.container}>
       <CHeader headerTitle="Trang cá nhân" type={HEADER_TYPE.NORMAL} />
@@ -95,6 +123,7 @@ const ProfilePage: React.FC<Props> = (props) => {
             alignItems: 'center',
             marginTop: 20 * ratio,
           }}>
+          <TouchableOpacity activeOpacity={1} onPress={() => updateAva()}>
           <Image
             style={{
               width: 70 * ratio,
@@ -104,12 +133,13 @@ const ProfilePage: React.FC<Props> = (props) => {
             }}
             source={{
               uri:
-                'https://discovery-park.co.uk/wp-content/uploads/2017/06/avatar-default.png',
+              user?.avatar || 'https://discovery-park.co.uk/wp-content/uploads/2017/06/avatar-default.png',
             }}
           />
+          </TouchableOpacity>
           <View style={{flexDirection: 'column', marginLeft: 15 * ratio}}>
             <CText bold style={{fontSize: 18 * ratio}}>
-              {user.name}
+              {user.username}
             </CText>
 
             <CText style={{fontSize: 18 * ratio, color: 'grey'}}>
@@ -123,7 +153,6 @@ const ProfilePage: React.FC<Props> = (props) => {
             </CText>
             <TouchableOpacity
               onPress={() => {
-                console.info('press');
                 dispatch(SignoutRequest.get());
               }}>
               <CText
@@ -132,6 +161,21 @@ const ProfilePage: React.FC<Props> = (props) => {
               </CText>
             </TouchableOpacity>
           </View>
+        </View>
+        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around'}}>
+        <View style={{ alignItems: 'center', justifyContent: 'center'}}>
+            <CText bold fontSize={18}>{profileInfo?.Posts.length || 0}</CText>
+            <CText>bài đăng</CText>
+          </View>
+          <TouchableOpacity activeOpacity={0.9} style={{ alignItems: 'center', justifyContent: 'center'}} onPress={() => navigate('Followers')}>
+            <CText bold fontSize={18}>{profileInfo?.followers.length || 0}</CText>
+            <CText>người theo dõi</CText>
+          </TouchableOpacity>
+          <TouchableOpacity activeOpacity={0.9} style={{ alignItems: 'center', justifyContent: 'center'}} onPress={() => navigate('Followings')}>
+            <CText bold fontSize={18}>{profileInfo?.followings.length || 0}</CText>
+            <CText>đang theo dõi</CText>
+          </TouchableOpacity>
+
         </View>
         <CText
           bold
@@ -144,10 +188,11 @@ const ProfilePage: React.FC<Props> = (props) => {
           Công thức của bạn
         </CText>
         <FlatList
-          data={props.listFavorite}
+          data={profileInfo?.Posts}
           keyExtractor={(index) => index.toString()}
           renderItem={_renderItem}
           showsVerticalScrollIndicator={false}
+          ListEmptyComponent={() => <EmptyList />}
         />
       </View>
       <View>{renderFloatingBtn()}</View>

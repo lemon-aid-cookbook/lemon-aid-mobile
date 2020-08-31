@@ -2,66 +2,37 @@ import {CText, CHeader} from 'components';
 import React, {useEffect, useState} from 'react';
 import {StyleSheet, View, FlatList, Image, TouchableOpacity} from 'react-native';
 import {useNavigation} from 'react-navigation-hooks';
-import {HEADER_TYPE, ratio, COLOR} from 'config/themeUtils';
+import {HEADER_TYPE, ratio, COLOR, TAB_TYPES} from 'config/themeUtils';
 import SegmentedControlTab from "react-native-segmented-control-tab";
 import Feather from 'react-native-vector-icons/Feather';
 import Foundation from 'react-native-vector-icons/Foundation';
 import RecipeItem from './components/recipeItem'
+import { useDispatch, useSelector } from 'react-redux';
+import { GetProfile, GetMostFave, GetRecent, GetFavoritePost, GetFollowPost } from 'pages/Profile/redux/actions';
+import HomeTabComponent from './components/tabBarWrap';
 
 export interface Props {
   listRecipe: any[];
 }
-const defaultProps = {
-  listRecipe: [
-    {
-      id: 0,
-      favCount: 30,
-      userId: 3,
-      userName: 'stevenblack1717',
-      icon: 'https://source.unsplash.com/random',
-      ava: 'https://source.unsplash.com/random',
-      title: 'Salad ngon ngon',
-      time: 3600,
-    },
-    {
-      id: 1,
-      favCount: 30,
-      userId: 3,
-      userName: 'stevenblack1717',
-      icon: 'https://source.unsplash.com/random',
-      ava: 'https://source.unsplash.com/random',
-      title: 'Salad ngon ngon',
-      time: 3600,
-    },
-    {
-      id: 2,
-      favCount: 30,
-      userId: 3,
-      userName: 'stevenblack1717',
-      icon: 'https://source.unsplash.com/random',
-      ava: 'https://source.unsplash.com/random',
-      title: 'Salad ngon ngon',
-      time: 3600,
-    },
-  ],
-};
+
 const SearchPage: React.FC<Props> = (props) => {
-  const {goBack, navigate} = useNavigation();
-  const [segmentIndex, setSegmentIndex] = useState(0);
-
-  const handleIndexChange = (index: number) => {
-    setSegmentIndex(index)
-  };
-
-  const _renderItem = ({item, index}: {item: any; index: string}) => {
-    return (
-      <TouchableOpacity onPress={() => { navigate('Detail')}}>
-        <View style={{ width: '100%'}}>
-        <RecipeItem item={item} />
-      </View>
-      </TouchableOpacity>
-    );
-  };
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.Auth.user);
+  const profile = useSelector((state) => state.Profile);
+  
+  useEffect(() => {
+    if (user) {
+      dispatch(GetProfile.get(user.username))
+      dispatch(GetFollowPost.get({
+        userId: user.id,
+        limit: 10,
+        page: 1,
+        type: TAB_TYPES[2]
+      }))
+    }
+    dispatch(GetMostFave.get())
+    dispatch(GetRecent.get())
+  }, [])
 
   return (
     <View style={styles.container}>
@@ -72,49 +43,11 @@ const SearchPage: React.FC<Props> = (props) => {
         }}
       />
       <View style={styles.listWrap}>
-        <View style={{ marginHorizontal: 16 * ratio, paddingBottom: 10 * ratio}}>
-        <SegmentedControlTab
-          values={['Yêu thích', 'Theo dõi', 'Mới nhất']}
-          selectedIndex={segmentIndex}
-          onTabPress={handleIndexChange}
-          tabStyle={{ backgroundColor: 'white', borderColor: COLOR.PRIMARY_ACTIVE}}
-          activeTabStyle={{ backgroundColor: COLOR.PRIMARY_ACTIVE}}
-          activeTabTextStyle={{ color: 'white', fontSize: 16 * ratio, fontFamily: 'Cabin-SemiBold'}}
-          tabTextStyle={{fontSize: 16 * ratio, fontFamily: 'Cabin-Regular', color: COLOR.PRIMARY_ACTIVE}}
-        />
-          </View>
-        {/* <SegmentedControl
-          values={['Yêu thích', 'Theo dõi', 'Mới nhất']}
-          selectedIndex={segmentIndex}
-          onChange={(event) => {
-            setSegmentIndex(event.nativeEvent.selectedSegmentIndex);
-          }}
-          tintColor={COLOR.PRIMARY_ACTIVE}
-          backgroundColor={'white'}
-          fontStyle={{
-            color: COLOR.PRIMARY_ACTIVE,
-            fontSize: 16 * ratio,
-            fontFamily: 'Cabin-Regular',
-          }}
-          activeFontStyle={{
-            color: 'white',
-            fontSize: 16 * ratio,
-            fontFamily: 'Cabin-Regular',
-          }}
-          style={{marginHorizontal: 16 * ratio}}
-        /> */}
-        <FlatList
-          data={props.listRecipe}
-          keyExtractor={(index) => index.toString()}
-          renderItem={_renderItem}
-          showsVerticalScrollIndicator={false}
-        />
+        <HomeTabComponent />
       </View>
     </View>
   );
 };
-
-SearchPage.defaultProps = defaultProps;
 
 export default SearchPage;
 const styles = StyleSheet.create({
@@ -127,8 +60,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 24 * ratio,
     borderTopRightRadius: 24 * ratio,
     backgroundColor: 'white',
-    paddingTop: 16 * ratio,
-    paddingVertical: 16 * ratio
+    paddingBottom: 16 * ratio
   },
   cardItem: {
     marginHorizontal: 16 * ratio,

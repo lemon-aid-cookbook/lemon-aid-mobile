@@ -17,6 +17,8 @@ import { createStackNavigator } from 'react-navigation-stack';
 import { createBottomTabNavigator } from 'react-navigation-tabs';
 import { DEVICE_WIDTH } from 'config/themeUtils'
 import CreatePostPage from 'pages/CreatePost';
+import FollowingPage from 'pages/Profile/components/followings';
+import FollowerPage from 'pages/Profile/components/followers';
 const CameraStack = createStackNavigator(
   {
     Camera: { screen: CameraPage },
@@ -36,6 +38,7 @@ CameraStack.navigationOptions = ({ navigation }) => {
 const FavoriteStack = createStackNavigator(
   {
     Favorite: { screen: FavoritePage },
+    Detail: { screen: DetailPage }
   },
   {
     headerMode: 'none',
@@ -82,7 +85,10 @@ const LoginStack = createStackNavigator(
 const ProfileStack = createStackNavigator(
   {
     ProfilePage: ProfilePage,
-    CreatePost: CreatePostPage
+    CreatePost: CreatePostPage,
+    Detail: DetailPage,
+    Followings: FollowingPage,
+    Followers: FollowerPage
   },
   {
     headerMode: 'none',

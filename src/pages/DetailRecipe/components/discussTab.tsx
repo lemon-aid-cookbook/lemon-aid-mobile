@@ -10,6 +10,8 @@ import {
 } from 'react-native';
 import {TouchableOpacity, FlatList} from 'react-native-gesture-handler';
 import {useNavigation} from 'react-navigation-hooks';
+import { useSelector, useDispatch } from 'react-redux';
+import { CommentPost } from 'pages/Profile/redux/actions';
 export interface Props {
   listCmt: any[];
 }
@@ -36,6 +38,11 @@ const defaultProps = {
 const DiscussTab: React.FC<Props> = (props) => {
   const {goBack, navigate} = useNavigation();
   const [cmt, setCmt] = useState('');
+  const [replyCmt, setReplyCmt] = useState('');
+  const detailPost = useSelector((state) => state.Profile.detailPost);
+  const user = useSelector((state) => state.Auth.user);
+  const dispatch = useDispatch();
+  const [reply, setReply] = useState(-1)
 
   const renderDiscussInput = () => {
     return (
@@ -49,7 +56,7 @@ const DiscussTab: React.FC<Props> = (props) => {
           }}>
           <Image
             source={{
-              uri: 'https://source.unsplash.com/random',
+              uri: user?.avatar || 'https://source.unsplash.com/random',
             }}
             style={styles.avaWrap}
           />
@@ -70,48 +77,189 @@ const DiscussTab: React.FC<Props> = (props) => {
                 ? COLOR.PRIMARY_ACTIVE
                 : COLOR.DEACTIVE_GRAY
             }
-            onPressRightIcon={() => console.info(cmt)}
-            onSubmitEditing={() => console.info('submit', cmt)}
+            onPressRightIcon={() => {
+              dispatch(
+                CommentPost.get({
+                  postId: detailPost.id,
+                  userId: user.id,
+                  parentCommentId: null,
+                  message: cmt
+                })
+              )
+              setCmt('')
+            }}
+            onSubmitEditing={() =>  {
+              dispatch(
+                CommentPost.get({
+                  postId: detailPost.id,
+                  userId: user.id,
+                  parentCommentId: null,
+                  message: cmt
+                })
+              )
+              setCmt('')
+            }}
           />
         </View>
       </View>
     );
   };
 
-  const renderItem = ({item, index}: {item: any; index: number}) => {
+  const renderSubItem = ({item, index}: {item: any; index: number}) => {
     return (
-      <View
+      <View>
+        <View
         style={{
           flexDirection: 'row',
           alignItems: 'flex-start',
-          marginVertical: 9 * ratio,
+          marginVertical: 4 * ratio,
+          paddingHorizontal: 16 * ratio
         }}
         key={index}>
         <Image
           source={{
-            uri: item.ava,
+            uri: item.User?.avatar,
           }}
           style={styles.avaWrap}
         />
         <View style={{flex: 1}}>
           <CText fontSize={14} bold>
-            {item.name}
+            {item.User?.username}
           </CText>
           <View style={{flex: 1, flexDirection: 'row', flexWrap: 'wrap'}}>
             <CText fontSize={14} style={{flex: 1, textAlign: 'justify'}}>
-              {item.cmt}
+              {item.message}
             </CText>
           </View>
         </View>
       </View>
+      </View>
     );
   };
 
+  const renderItem = ({item, index}: {item: any; index: number}) => {
+    return (
+      <View>
+        <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'flex-start',
+          marginVertical: 4 * ratio,
+          paddingHorizontal: 16 * ratio
+        }}
+        key={index}>
+        <Image
+          source={{
+            uri: item.User?.avatar,
+          }}
+          style={styles.avaWrap}
+        />
+        <View style={{flex: 1}}>
+          <CText fontSize={14} bold>
+            {item.User?.username}
+          </CText>
+          <View style={{flex: 1, flexDirection: 'row', flexWrap: 'wrap'}}>
+            <CText fontSize={14} style={{flex: 1, textAlign: 'justify'}}>
+              {item.message}
+            </CText>
+          </View>
+          <TouchableOpacity onPress={() => setReply(reply === index ? -1 : index)}>
+          <CText fontSize={14} color={COLOR.PRIMARY_ACTIVE}>Trả lời</CText>
+          </TouchableOpacity>
+          {reply === index && renderReplyInput(item)}
+        </View>
+      </View>
+      <View style={{ paddingLeft: 36 * ratio}}>
+      <FlatList
+      showsVerticalScrollIndicator={false}
+          data={item.SubComment}
+          keyExtractor={(index) => index.toString()}
+          renderItem={renderSubItem}
+          ItemSeparatorComponent={() => {
+              return (
+                <View
+                style={{
+                  backgroundColor: COLOR.LIGHT_GRAY,
+                  height: 1 * ratio,
+                  width: '100%',
+                  marginVertical: 9 * ratio,
+                }}
+              />
+              )
+          }}
+        />
+      </View>
+      </View>
+    );
+  };
+
+  const renderReplyInput = (item: any) => {
+    return (
+      <View>
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            marginVertical: 9 * ratio,
+            marginHorizontal: 0 * ratio,
+          }}>
+          <Image
+            source={{
+              uri: user?.avatar || 'https://source.unsplash.com/random',
+            }}
+            style={styles.avaWrap}
+          />
+          <CInput
+            containerStyle={{flex: 1, justifyContent: 'center'}}
+            style={[styles.inputWrap, { width: '100%'}]}
+            // multiline
+            textSize={14}
+            placeholder={'Nhập thảo luận...'}
+            value={replyCmt}
+            onChangeText={(text: string) => {
+              setReplyCmt(text);
+            }}
+            showIcon={true}
+            rightIcon={'send'}
+            rightIconColor={
+              cmt.replace(/\s/g, '').length > 0
+                ? COLOR.PRIMARY_ACTIVE
+                : COLOR.DEACTIVE_GRAY
+            }
+            onPressRightIcon={() => {
+              dispatch(
+                CommentPost.get({
+                  postId: detailPost.id,
+                  userId: user.id,
+                  parentCommentId: item.id,
+                  message: replyCmt
+                })
+              )
+              setReplyCmt('')
+            }}
+            onSubmitEditing={() => {
+              dispatch(
+                CommentPost.get({
+                  postId: detailPost.id,
+                  userId: user.id,
+                  parentCommentId: item.id,
+                  message: replyCmt
+                })
+              )
+              setReplyCmt('')
+            }}
+          />
+        </View>
+      </View>
+    );
+  }
+
   const renderComment = () => {
     return (
-      <View style={{ marginHorizontal: 16 * ratio, }}>
+      <View style={{ flex: 1}}>
         <FlatList
-          data={props.listCmt}
+        showsVerticalScrollIndicator={false}
+          data={detailPost.Comments}
           keyExtractor={(index) => index.toString()}
           renderItem={renderItem}
           ItemSeparatorComponent={() => {
@@ -132,18 +280,16 @@ const DiscussTab: React.FC<Props> = (props) => {
   };
   return (
     <View style={styles.container}>
-      <View style={styles.listWrap}>
-        {renderDiscussInput()}
-        <View
+        {user && renderDiscussInput()}
+        {user && <View
           style={{
             backgroundColor: COLOR.LIGHT_GRAY,
             height: 8 * ratio,
             width: '100%',
             marginVertical: 9 * ratio,
           }}
-        />
+        />}
         {renderComment()}
-      </View>
     </View>
   );
 };
@@ -157,10 +303,8 @@ const styles = StyleSheet.create({
   },
   listWrap: {
     flex: 1,
-    borderTopLeftRadius: 24 * ratio,
-    borderTopRightRadius: 24 * ratio,
     backgroundColor: 'white',
-    paddingVertical: 16 * ratio,
+    paddingTop: 16 * ratio
   },
   avaWrap: {
     width: 40 * ratio,
