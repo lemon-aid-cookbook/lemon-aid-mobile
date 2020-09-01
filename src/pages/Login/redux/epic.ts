@@ -1,11 +1,23 @@
+import {GlobalLoadingSetup, GlobalModalSetup} from 'components';
+import {NavigationActions} from 'react-navigation';
 import {Observable} from 'redux';
 import {combineEpics, ofType} from 'redux-observable';
 import {PlainAction} from 'redux-typed-actions';
+import {store} from 'reduxs';
 import {of} from 'rxjs';
 import {catchError, exhaustMap, map} from 'rxjs/operators';
-import {GlobalLoadingSetup} from 'components';
 import {request} from 'utils/network/api';
-import {LoginRequest, LoginRequestFailed, LoginRequestSuccess} from './actions';
+import {
+  LoginRequest,
+  LoginRequestFailed,
+  LoginRequestSuccess,
+  SignupRequest,
+  SignupRequestFailed,
+  SignupRequestSuccess,
+  SignoutRequest,
+} from './actions';
+import {MODAL_TYPE} from 'config/themeUtils';
+import { GetProfile } from 'pages/Profile/redux/actions';
 
 const loginRequest$ = (action$: Observable<PlainAction>) =>
   action$.pipe(
@@ -13,22 +25,101 @@ const loginRequest$ = (action$: Observable<PlainAction>) =>
     exhaustMap((action: any) => {
       GlobalLoadingSetup.getLoading().isVisible();
       return request<any>({
-        method: 'GET',
-        url: 'cities',
+        method: 'POST',
+        url: 'signin',
+        param: action.payload,
+        option: {
+          format: 'json',
+        },
       }).pipe(
         map((value) => {
           GlobalLoadingSetup.getLoading().isHide();
-          if ((value as any).result.length > 0) {
-            return LoginRequestSuccess.get((value as any).result);
+          if ((value as any).status === 200) {
+            return LoginRequestSuccess.get((value as any).data);            
           }
-          return LoginRequestFailed.get();
+          return LoginRequestFailed.get(value.data);
         }),
         catchError((error) => {
           GlobalLoadingSetup.getLoading().isHide();
-          return of(LoginRequestFailed.get(error));
+          GlobalModalSetup.getGlobalModalHolder().alertMessage(
+            'Thông báo',
+            (error as any).data?.message,
+          );
+          return of(LoginRequestFailed.get(error.data));
         }),
       );
     }),
   );
 
-export const authEpics = combineEpics(loginRequest$);
+const signupRequest$ = (action$: Observable<PlainAction>) =>
+  action$.pipe(
+    ofType(SignupRequest.type),
+    exhaustMap((action: any) => {
+      GlobalLoadingSetup.getLoading().isVisible();
+      return request<any>({
+        method: 'POST',
+        url: 'signup',
+        param: action.payload,
+        option: {
+          format: 'json',
+        },
+      }).pipe(
+        map((value) => {
+          GlobalLoadingSetup.getLoading().isHide();
+          if ((value as any).status === 200) {
+            GlobalModalSetup.getGlobalModalHolder().alertMessage(
+              'Thông báo',
+              value.data.message,
+              MODAL_TYPE.NORMAL,
+              () =>
+                store.dispatch(
+                  NavigationActions.navigate({
+                    routeName: 'Login',
+                  }),
+                ),
+            );
+            return store.dispatch(
+              NavigationActions.navigate({
+                routeName: 'Login',
+              }),
+            )
+          }
+          return SignupRequestFailed.get(value.data);
+        }),
+        catchError((error) => {
+          GlobalLoadingSetup.getLoading().isHide();
+          GlobalModalSetup.getGlobalModalHolder().alertMessage(
+            'Thông báo',
+            (error as any).data?.message,
+          );
+          return of(SignupRequestFailed.get(error));
+        }),
+      );
+    }),
+  );
+
+  const signOutRequest$ = (action$: Observable<PlainAction>) =>
+  action$.pipe(
+    ofType(SignoutRequest.type),
+    map(() => {
+      return store.dispatch(
+        NavigationActions.navigate({
+          routeName: 'Login',
+        }),
+      );
+    }),
+  );
+
+  const logInSuccess$ = (action$: Observable<PlainAction>) =>
+  action$.pipe(
+    ofType(LoginRequestSuccess.type),
+    map((action: any) => {
+      store.dispatch(GetProfile.get(action.payload.user.username))
+      return store.dispatch(
+        NavigationActions.navigate({
+          routeName: 'Profile',
+        }),
+      );
+    }),
+  );
+export const authEpics = combineEpics(loginRequest$, signupRequest$, signOutRequest$, logInSuccess$);

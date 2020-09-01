@@ -43,7 +43,7 @@ class App extends React.Component<Props, {}> {
         [
           {
             text: 'Từ chối',
-            onPress: () => console.info('Cancel Pressed'),
+            onPress: () => {},
             style: 'cancel',
           },
           {

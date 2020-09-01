@@ -3,6 +3,7 @@ import React from 'react';
 import {SafeAreaView, StatusBar, StyleSheet, Text, View} from 'react-native';
 import {NavigationActions, StackActions} from 'react-navigation';
 import {APP_NAME} from 'config';
+import { COLOR } from 'config/themeUtils';
 
 export default class SplashScreen extends React.Component {
   constructor(props) {
@@ -13,7 +14,7 @@ export default class SplashScreen extends React.Component {
   componentDidMount() {
     setTimeout(() => {
       return this._navigateReset('Main');
-    }, 5000);
+    }, 3000);
   }
 
   _navigateReset = (routeName) => {
@@ -33,7 +34,7 @@ export default class SplashScreen extends React.Component {
             source={require('../../assets/food-carousel.json')}
             autoPlay
             loop
-            style={{width: '100%'}}
+            style={{width: 300}}
             resizeMode={'contain'}
           />
           <Text style={styles.title}>{APP_NAME}</Text>
@@ -55,9 +56,11 @@ const styles = StyleSheet.create({
     marginTop: -60,
   },
   title: {
+    width: '100%',
+    textAlign: 'center',
     fontSize: 40,
-    letterSpacing: 4,
+    letterSpacing: 3,
     fontFamily: 'Pacifico-Regular',
-    color: '#FF7000',
+    color: COLOR.PRIMARY_ACTIVE,
   },
 });

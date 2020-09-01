@@ -13,7 +13,7 @@ const persistConfig = {
   version: 0,
   storage: AsyncStorage,
   blacklist: [],
-  whitelist: ['Root'],
+  whitelist: ['Auth'],
   stateReconciler: autoMergeLevel2,
 };
 
