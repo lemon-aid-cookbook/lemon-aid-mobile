@@ -1,24 +1,15 @@
-import {CHeader, CText, CInput, CButton} from 'components';
-import {COLOR, HEADER_TYPE, ratio} from 'config/themeUtils';
-import {SignoutRequest} from 'pages/Login/redux/actions';
-import RecipeItem from 'pages/Search/components/recipeItem';
+import {COLOR, ratio} from 'config/themeUtils';
 import React, {useState} from 'react';
-import {
-  FlatList,
-  Image,
-  StyleSheet,
-  TouchableWithoutFeedback,
-  View,
-} from 'react-native';
+import {Image, StyleSheet, View} from 'react-native';
+import {TouchableOpacity} from 'react-native-gesture-handler';
+import ImagePicker from 'react-native-image-picker';
 import Feather from 'react-native-vector-icons/Feather';
 import {useNavigation} from 'react-navigation-hooks';
-import {useDispatch, useSelector} from 'react-redux';
-import {TouchableOpacity, ScrollView} from 'react-native-gesture-handler';
-import ImagePicker from 'react-native-image-picker';
+import {useDispatch} from 'react-redux';
 
 export interface Props {
   type: 'BIG' | 'SMALL';
-  onChange: (data: any) => void
+  onChange: (data: any) => void;
 }
 
 const defaultProps = {};
@@ -26,7 +17,7 @@ const defaultProps = {};
 const ImageUpload: React.FC<Props> = (props) => {
   const {goBack, navigate} = useNavigation();
   const dispatch = useDispatch();
-  const [image, setImage] = useState('')
+  const [image, setImage] = useState('');
 
   const insertThubnail = () => {
     ImagePicker.showImagePicker(
@@ -35,12 +26,11 @@ const ImageUpload: React.FC<Props> = (props) => {
       },
       (result) => {
         if (!result.didCancel) {
-          props.onChange(result.data);
-          setImage(result.data)
-        } 
-      }
+          props.onChange('data:image/jpeg;base64,' + result.data);
+          setImage(result.data);
+        }
+      },
     );
-    console.info('iamge', image)
   };
 
   const renderThumbnail = () => {
@@ -62,13 +52,13 @@ const ImageUpload: React.FC<Props> = (props) => {
           }}>
           {image.length > 0 ? (
             <Image
-            resizeMode={'cover'}
+              resizeMode={'cover'}
               source={{
                 uri: `data:image/png;base64,${image}`,
               }}
               style={{
                 width: props.type === 'BIG' ? '100%' : 100 * ratio,
-            height: props.type === 'BIG' ? 200 * ratio : 100 * ratio,
+                height: props.type === 'BIG' ? 200 * ratio : 100 * ratio,
                 borderRadius: 9 * ratio,
               }}
             />
@@ -84,11 +74,7 @@ const ImageUpload: React.FC<Props> = (props) => {
     );
   };
 
-  return (
-    <View style={styles.container}>
-      {renderThumbnail()}
-    </View>
-  );
+  return <View style={styles.container}>{renderThumbnail()}</View>;
 };
 
 ImageUpload.defaultProps = defaultProps;

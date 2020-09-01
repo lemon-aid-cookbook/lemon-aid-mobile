@@ -1,4 +1,4 @@
-import { COLOR, ratio } from 'config/themeUtils';
+import {COLOR, ratio} from 'config/themeUtils';
 import CameraPage from 'pages/Camera';
 import DetailPage from 'pages/DetailRecipe';
 import FavoritePage from 'pages/Favorite';
@@ -10,36 +10,37 @@ import SearchPage from 'pages/Search';
 import SignUpPage from 'pages/SignUp';
 import SplashScreen from 'pages/Splash';
 import React from 'react';
-import { View } from 'react-native';
+import {View} from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
-import { createAppContainer, createSwitchNavigator } from 'react-navigation';
-import { createStackNavigator } from 'react-navigation-stack';
-import { createBottomTabNavigator } from 'react-navigation-tabs';
-import { DEVICE_WIDTH } from 'config/themeUtils'
+import {createAppContainer, createSwitchNavigator} from 'react-navigation';
+import {createStackNavigator} from 'react-navigation-stack';
+import {createBottomTabNavigator} from 'react-navigation-tabs';
+import {DEVICE_WIDTH} from 'config/themeUtils';
 import CreatePostPage from 'pages/CreatePost';
 import FollowingPage from 'pages/Profile/components/followings';
 import FollowerPage from 'pages/Profile/components/followers';
-import SearchDetailPage from 'pages/Search/components/searchDetail'
+import ChangePasswordPage from 'pages/Profile/components/updatePassword';
+import SearchDetailPage from 'pages/Search/components/searchDetail';
 const CameraStack = createStackNavigator(
   {
-    Camera: { screen: CameraPage },
+    Camera: {screen: CameraPage},
   },
   {
     headerMode: 'none',
     initialRouteName: 'Camera',
   },
 );
-CameraStack.navigationOptions = ({ navigation }) => {
+CameraStack.navigationOptions = ({navigation}) => {
   if (navigation.state.routes[navigation.state.index].routeName === 'Camera') {
-    return { tabBarVisible: true };
+    return {tabBarVisible: true};
   }
-  return { tabBarVisible: false };
+  return {tabBarVisible: false};
 };
 
 const FavoriteStack = createStackNavigator(
   {
-    Favorite: { screen: FavoritePage },
-    Detail: { screen: DetailPage }
+    Favorite: {screen: FavoritePage},
+    Detail: {screen: DetailPage},
   },
   {
     headerMode: 'none',
@@ -47,18 +48,20 @@ const FavoriteStack = createStackNavigator(
   },
 );
 
-FavoriteStack.navigationOptions = ({ navigation }) => {
-  if (navigation.state.routes[navigation.state.index].routeName === 'Favorite') {
-    return { tabBarVisible: true };
+FavoriteStack.navigationOptions = ({navigation}) => {
+  if (
+    navigation.state.routes[navigation.state.index].routeName === 'Favorite'
+  ) {
+    return {tabBarVisible: true};
   }
-  return { tabBarVisible: false };
+  return {tabBarVisible: false};
 };
 
 const SearchStack = createStackNavigator(
   {
-    Search: { screen: SearchPage },
-    Detail: { screen: DetailPage },
-    SearchDetail: { screen: SearchDetailPage}
+    Search: {screen: SearchPage},
+    Detail: {screen: DetailPage},
+    SearchDetail: {screen: SearchDetailPage},
   },
   {
     headerMode: 'none',
@@ -66,17 +69,17 @@ const SearchStack = createStackNavigator(
   },
 );
 
-SearchStack.navigationOptions = ({ navigation }) => {
+SearchStack.navigationOptions = ({navigation}) => {
   if (navigation.state.routes[navigation.state.index].routeName === 'Search') {
-    return { tabBarVisible: true };
+    return {tabBarVisible: true};
   }
-  return { tabBarVisible: false };
+  return {tabBarVisible: false};
 };
 
 const LoginStack = createStackNavigator(
   {
-    LoginPage: { screen: LoginPage },
-    ForgotPassword: { screen: ForgotPasswordPage },
+    LoginPage: {screen: LoginPage},
+    ForgotPassword: {screen: ForgotPasswordPage},
   },
   {
     headerMode: 'none',
@@ -90,7 +93,8 @@ const ProfileStack = createStackNavigator(
     CreatePost: CreatePostPage,
     Detail: DetailPage,
     Followings: FollowingPage,
-    Followers: FollowerPage
+    Followers: FollowerPage,
+    ChangePassword: ChangePasswordPage,
   },
   {
     headerMode: 'none',
@@ -98,11 +102,13 @@ const ProfileStack = createStackNavigator(
   },
 );
 
-ProfileStack.navigationOptions = ({ navigation }) => {
-  if (navigation.state.routes[navigation.state.index].routeName === 'ProfilePage') {
-    return { tabBarVisible: true };
+ProfileStack.navigationOptions = ({navigation}) => {
+  if (
+    navigation.state.routes[navigation.state.index].routeName === 'ProfilePage'
+  ) {
+    return {tabBarVisible: true};
   }
-  return { tabBarVisible: false };
+  return {tabBarVisible: false};
 };
 
 const ProfileSwitch = createSwitchNavigator(
@@ -118,11 +124,14 @@ const ProfileSwitch = createSwitchNavigator(
   },
 );
 
-ProfileSwitch.navigationOptions = ({ navigation }) => {
-  if (navigation.state.routes[navigation.state.index].routeName === 'Profile' || navigation.state.routes[navigation.state.index].routeName === 'Login') {
-    return { tabBarVisible: true };
+ProfileSwitch.navigationOptions = ({navigation}) => {
+  if (
+    navigation.state.routes[navigation.state.index].routeName === 'Profile' ||
+    navigation.state.routes[navigation.state.index].routeName === 'Login'
+  ) {
+    return {tabBarVisible: true};
   }
-  return { tabBarVisible: false };
+  return {tabBarVisible: false};
 };
 
 const MainTabNavigator = createBottomTabNavigator(
@@ -133,13 +142,17 @@ const MainTabNavigator = createBottomTabNavigator(
     Profile: ProfileSwitch,
   },
   {
-    defaultNavigationOptions: ({ navigation }) => ({
-      tabBarIcon: ({ focused }) => {
-        const { routeName } = navigation.state;
+    defaultNavigationOptions: ({navigation}) => ({
+      tabBarIcon: ({focused}) => {
+        const {routeName} = navigation.state;
         const itemBar = (iconName, name, color, focused) => {
           return (
-            <View style={{ alignItems: 'center', width: DEVICE_WIDTH / 4 }}>
-              <Feather name={iconName} size={24 * ratio} color={focused ? color : '#888888'} />
+            <View style={{alignItems: 'center', width: DEVICE_WIDTH / 4}}>
+              <Feather
+                name={iconName}
+                size={24 * ratio}
+                color={focused ? color : '#888888'}
+              />
             </View>
           );
         };
