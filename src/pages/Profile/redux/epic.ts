@@ -46,6 +46,9 @@ import {
   CommentPost,
   CommentPostSuccess,
   CommentPostFailed,
+  SearchRecipes,
+  SearchRecipesSuccess,
+  SearchRecipesFailed,
 } from './actions';
 import { TAB_TYPES } from 'config/themeUtils';
 
@@ -449,7 +452,7 @@ const updateInfo$ = (action$: Observable<PlainAction>) =>
   action$.pipe(
     ofType(UpdateInfo.type),
     exhaustMap((action: any) => {
-      console.info(`user/update/${action.payload.userId}`)
+
       return request<any>({
         method: 'PUT',
         url: `user/update/${action.payload.userId}`,
@@ -518,6 +521,39 @@ const commentPost$ = (action$: Observable<PlainAction>) =>
     }),
   );
 
+  const getSearchPost$ = (action$: Observable<PlainAction>) =>
+  action$.pipe(
+    ofType(SearchRecipes.type),
+    exhaustMap((action: any) => {
+      GlobalLoadingSetup.getLoading().isVisible();
+      return request<any>({
+        method: 'GET',
+        url: 'post/search',
+        param: action.payload
+      }).pipe(
+        map((value) => {
+          GlobalLoadingSetup.getLoading().isHide();
+          if ((value as any).status === 200) {
+            return SearchRecipesSuccess.get((value as any).data);
+          }
+          GlobalModalSetup.getGlobalModalHolder().alertMessage(
+            'Thông báo',
+            (value as any).data?.message,
+          );
+          return SearchRecipesFailed.get(value.data);
+        }),
+        catchError((error) => {
+          GlobalLoadingSetup.getLoading().isHide();
+          GlobalModalSetup.getGlobalModalHolder().alertMessage(
+            'Thông báo',
+            (error as any).data?.message,
+          );
+          return of(SearchRecipesFailed.get(error.data));
+        }),
+      );
+    }),
+  );
+
 export const profileEpics = combineEpics(
   getProfileRequest$,
   getFavoritePost$,
@@ -533,5 +569,6 @@ export const profileEpics = combineEpics(
   unFollowUser$,
   updateInfo$,
   commentPost$,
-  getFollowPostFav$
+  getFollowPostFav$,
+  getSearchPost$
 );

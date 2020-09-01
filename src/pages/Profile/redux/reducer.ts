@@ -1,6 +1,6 @@
 import {PlainAction} from 'redux-typed-actions';
 import {ProfileState} from '../model';
-import {GetProfileSuccess, GetFavoritePostSuccess, GetMostFaveSuccess, GetRecentSuccess, GetFollowPostSuccess, GetDetailPostSuccess, GetDetailPostSuccessNotNav} from './actions';
+import {GetProfileSuccess, GetFavoritePostSuccess, GetMostFaveSuccess, GetRecentSuccess, GetFollowPostSuccess, GetDetailPostSuccess, GetDetailPostSuccessNotNav, SearchRecipesSuccess, ClearSearch} from './actions';
 import { SignoutRequest } from 'pages/Login/redux/actions';
 
 const initialState: ProfileState = {
@@ -10,6 +10,8 @@ const initialState: ProfileState = {
   followPost: [],
   favPost: [],
   detailPost: null,
+  searchResult: [],
+  totalItems: 0,
 };
 
 export function profileReducer(
@@ -39,6 +41,20 @@ export function profileReducer(
       return {...state, detailPost: action.payload.post}
       case SignoutRequest.type:
       return {};
+      case SearchRecipesSuccess.type:
+        return {
+          ...state,
+          searchResult: action.payload.posts,
+        totalItems: action.payload.numberOfPosts
+          ? action.payload.numberOfPosts
+          : 0,
+        }
+      case ClearSearch.type:
+        return {
+          ...state,
+          searchResult: [],
+        totalItems: 0
+        }
     default:
       return state;
   }

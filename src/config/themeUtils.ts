@@ -4,7 +4,8 @@ import * as yup from 'yup'
 export const HEADER_TYPE = {
   NORMAL: 'NORMAL',
   MAIN: 'MAIN',
-  SEARCH: 'SEARCH'
+  SEARCH: 'SEARCH',
+  HEADER_SEARCH: 'HEADER_SEARCH'
 };
 
 export const MODAL_TYPE = {

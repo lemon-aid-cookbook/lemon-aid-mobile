@@ -1,14 +1,15 @@
-import {CText, CHeader} from 'components';
-import React, {useEffect, useState} from 'react';
-import {StyleSheet, View, FlatList, Image, TouchableOpacity} from 'react-native';
+import {CHeader} from 'components';
+import {HEADER_TYPE, ratio, TAB_TYPES} from 'config/themeUtils';
+import {
+  GetFollowPost,
+  GetMostFave,
+  GetProfile,
+  GetRecent,
+} from 'pages/Profile/redux/actions';
+import React, {useEffect} from 'react';
+import {StyleSheet, View} from 'react-native';
 import {useNavigation} from 'react-navigation-hooks';
-import {HEADER_TYPE, ratio, COLOR, TAB_TYPES} from 'config/themeUtils';
-import SegmentedControlTab from "react-native-segmented-control-tab";
-import Feather from 'react-native-vector-icons/Feather';
-import Foundation from 'react-native-vector-icons/Foundation';
-import RecipeItem from './components/recipeItem'
-import { useDispatch, useSelector } from 'react-redux';
-import { GetProfile, GetMostFave, GetRecent, GetFavoritePost, GetFollowPost } from 'pages/Profile/redux/actions';
+import {useDispatch, useSelector} from 'react-redux';
 import HomeTabComponent from './components/tabBarWrap';
 
 export interface Props {
@@ -19,28 +20,29 @@ const SearchPage: React.FC<Props> = (props) => {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.Auth.user);
   const profile = useSelector((state) => state.Profile);
-  
+  const {goBack, navigate} = useNavigation();
+
   useEffect(() => {
     if (user) {
-      dispatch(GetProfile.get(user.username))
-      dispatch(GetFollowPost.get({
-        userId: user.id,
-        limit: 10,
-        page: 1,
-        type: TAB_TYPES[2]
-      }))
+      dispatch(GetProfile.get(user.username));
+      dispatch(
+        GetFollowPost.get({
+          userId: user.id,
+          limit: 10,
+          page: 1,
+          type: TAB_TYPES[2],
+        }),
+      );
     }
-    dispatch(GetMostFave.get())
-    dispatch(GetRecent.get())
-  }, [])
+    dispatch(GetMostFave.get());
+    dispatch(GetRecent.get());
+  }, []);
 
   return (
     <View style={styles.container}>
       <CHeader
         type={HEADER_TYPE.SEARCH}
-        onSearch={(text) => {
-          console.info(text);
-        }}
+        onInputPress={() => navigate('SearchDetail')}
       />
       <View style={styles.listWrap}>
         <HomeTabComponent />
@@ -60,7 +62,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 24 * ratio,
     borderTopRightRadius: 24 * ratio,
     backgroundColor: 'white',
-    paddingBottom: 16 * ratio
+    paddingBottom: 16 * ratio,
   },
   cardItem: {
     marginHorizontal: 16 * ratio,

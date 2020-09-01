@@ -17,9 +17,6 @@ const CameraPage: React.FC<Props> = (props) => {
   
 
   const uploadImage = () => {
-    // const options = {quality: 0.5, base64: true};
-    // const data = await camera.takePictureAsync(options);
-    // setImgUrl(data.uri);
     ImagePicker.showImagePicker(
       {
         maxWidth: 512,
@@ -61,10 +58,7 @@ const CameraPage: React.FC<Props> = (props) => {
         }).then((result) => {
           const val = result.data[0];
           const value = val[0].toUpperCase() + val.substring(1)
-          GlobalModalSetup.getGlobalModalHolder().alertMessage(
-            'Món ăn',
-            value,
-          );
+          navigate('SearchDetail', { keyword: value})
         });
       })
       .catch((er) => {
