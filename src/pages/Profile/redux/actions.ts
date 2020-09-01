@@ -58,3 +58,8 @@ export const DeleteCommentFailed = defineAction<any>('DELETE_COMMENT_FAILED')
 export const UpdateInfo = defineAction<any>('UPDATE_INFO')
 export const UpdateInfoSuccess = defineAction<any>('UPDATE_INFO_SUCCESS')
 export const UpdateInfoFailed = defineAction<any>('UPDATE_INFO_FAILED')
+
+export const SearchRecipes = defineAction<any>('SEARCH_RECIPES')
+export const SearchRecipesSuccess = defineAction<any>('SEARCH_RECIPES_SUCCESS')
+export const SearchRecipesFailed = defineAction<any>('SEARCH_RECIPES_FAILED')
+export const ClearSearch = defineAction<any>('CLEAR_SEARCH')

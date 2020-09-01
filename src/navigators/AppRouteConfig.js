@@ -19,6 +19,7 @@ import { DEVICE_WIDTH } from 'config/themeUtils'
 import CreatePostPage from 'pages/CreatePost';
 import FollowingPage from 'pages/Profile/components/followings';
 import FollowerPage from 'pages/Profile/components/followers';
+import SearchDetailPage from 'pages/Search/components/searchDetail'
 const CameraStack = createStackNavigator(
   {
     Camera: { screen: CameraPage },
@@ -56,7 +57,8 @@ FavoriteStack.navigationOptions = ({ navigation }) => {
 const SearchStack = createStackNavigator(
   {
     Search: { screen: SearchPage },
-    Detail: { screen: DetailPage }
+    Detail: { screen: DetailPage },
+    SearchDetail: { screen: SearchDetailPage}
   },
   {
     headerMode: 'none',
