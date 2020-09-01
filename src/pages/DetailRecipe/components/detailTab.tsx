@@ -295,6 +295,11 @@ const DetailTab: React.FC<Props> = (props) => {
             </CText>
           </View>
         </View>
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap'}}>
+        <CText style={{ flex: 1}} fontSize={16}>
+            {detailPost.description || ''}
+          </CText>
+        </View>
         {renderProfile()}
         <View style={{flexDirection: 'row', alignItems: 'center'}}>
           <CText

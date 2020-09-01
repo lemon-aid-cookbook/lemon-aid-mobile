@@ -21,6 +21,7 @@ interface Props {
   rightIcon?: string;
   smallTitle: boolean;
   onSearch?: (text: string) => void;
+  onInputPress?:() => void;
 }
 
 interface State {
@@ -37,18 +38,19 @@ class Header extends React.Component<Props, State, {}> {
     onRightPress: () => {},
     rightIcon: 'heart',
     smallTitle: false,
-    onSearch: (text: string) => {}
+    onSearch: (text: string) => {},
+    onInputPress: () => {}
   };
 
   constructor(props: Props) {
     super(props);
     this.state = {
-      searchValue: ''
+      searchValue: '',
     };
-    }
+  }
 
   render() {
-    if (this.props.type === HEADER_TYPE.SEARCH) {
+    if (this.props.type === HEADER_TYPE.HEADER_SEARCH) {
       return (
         <View style={styles.background}>
           <StatusBar translucent={true} backgroundColor="transparent" />
@@ -60,13 +62,32 @@ class Header extends React.Component<Props, State, {}> {
               value={this.state.searchValue}
               onChangeText={(text: string) => { this.setState({ searchValue: text})}}>
             </CInput>
-            <TouchableOpacity onPress={() => { this.props.onSearch(this.state.searchValue) }}>
-            <Feather name={'search'} size={24} color={'white'}/>
+            <TouchableOpacity
+              onPress={() => {
+                this.props.onSearch(this.state.searchValue);
+              }}>
+              <Feather name={'search'} size={24} color={'white'} />
             </TouchableOpacity>
           </View>
         </View>
       );
-    } else {
+    } else if (this.props.type === HEADER_TYPE.SEARCH)  {
+        return (
+          <View style={styles.background}>
+            <StatusBar translucent={true} backgroundColor="transparent" />
+            <TouchableOpacity activeOpacity={1} style={styles.searchHeaderWrap} onPress={() => this.props.onInputPress()}>
+              <View style={styles.textInput}>
+                <CText color={'#9B9B9B'} fontSize={16}>
+                  Tên món ăn...
+                </CText>
+              </View>
+              <View>
+                <Feather name={'search'} size={24} color={'white'} />
+              </View>
+            </TouchableOpacity>
+          </View>
+        );
+      } else {
       return (
         <View style={styles.background}>
           <StatusBar translucent={true} backgroundColor="transparent" />
@@ -94,7 +115,7 @@ class Header extends React.Component<Props, State, {}> {
                         width: '100%',
                         textAlign: 'center',
                       }
-                    : { paddingBottom: 5 * ratio}
+                    : {paddingBottom: 5 * ratio}
                 }
                 color="white"
                 fontSize={this.props.smallTitle ? 20 * ratio : 28 * ratio}>
@@ -145,7 +166,6 @@ const styles = StyleSheet.create({
     flex: 0.7,
     alignItems: 'center',
     justifyContent: 'center',
-
   },
   searchHeaderWrap: {
     width: '100%',
@@ -157,5 +177,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     backgroundColor: COLOR.PRIMARY_ACTIVE,
+  },
+  textInput: {
+    width: DEVICE_WIDTH * 0.8,
+    height: 45 * ratio,
+    fontSize: 16 * ratio,
+    backgroundColor: 'white',
+    borderRadius: 9 * ratio,
+    padding: 10 * ratio,
+    justifyContent: 'center'
   },
 });

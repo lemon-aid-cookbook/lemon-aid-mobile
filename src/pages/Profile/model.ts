@@ -5,4 +5,6 @@ export interface ProfileState {
   followPost: any;
   favPost: any;
   detailPost: any;
+  searchResult: any[];
+  totalItems: number
 }

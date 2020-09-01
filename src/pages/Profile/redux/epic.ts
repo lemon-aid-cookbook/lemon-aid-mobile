@@ -1,5 +1,5 @@
 import {GlobalLoadingSetup, GlobalModalSetup} from 'components';
-import {TAB_TYPES, MODAL_TYPE} from 'config/themeUtils';
+import {TAB_TYPES} from 'config/themeUtils';
 import {NavigationActions} from 'react-navigation';
 import {Observable} from 'redux';
 import {combineEpics, ofType} from 'redux-observable';
@@ -9,6 +9,9 @@ import {of} from 'rxjs';
 import {catchError, exhaustMap, map} from 'rxjs/operators';
 import {request} from 'utils/network/api';
 import {
+  ChangePassword,
+  ChangePasswordFailed,
+  ChangePasswordSuccess,
   CommentPost,
   CommentPostFailed,
   CommentPostSuccess,
@@ -50,9 +53,9 @@ import {
   UpdateInfo,
   UpdateInfoFailed,
   UpdateInfoSuccess,
-  ChangePassword,
-  ChangePasswordSuccess,
-  ChangePasswordFailed,
+  SearchRecipes,
+  SearchRecipesSuccess,
+  SearchRecipesFailed,
 } from './actions';
 
 const getProfileRequest$ = (action$: Observable<PlainAction>) =>
@@ -460,7 +463,6 @@ const updateInfo$ = (action$: Observable<PlainAction>) =>
   action$.pipe(
     ofType(UpdateInfo.type),
     exhaustMap((action: any) => {
-      console.info(`user/update/${action.payload.userId}`);
       return request<any>({
         method: 'PUT',
         url: `user/update/${action.payload.userId}`,
@@ -588,6 +590,38 @@ const changePasswordEpic$ = (action$: Observable<PlainAction>) =>
       );
     }),
   );
+const getSearchPost$ = (action$: Observable<PlainAction>) =>
+  action$.pipe(
+    ofType(SearchRecipes.type),
+    exhaustMap((action: any) => {
+      GlobalLoadingSetup.getLoading().isVisible();
+      return request<any>({
+        method: 'GET',
+        url: 'post/search',
+        param: action.payload,
+      }).pipe(
+        map((value) => {
+          GlobalLoadingSetup.getLoading().isHide();
+          if ((value as any).status === 200) {
+            return SearchRecipesSuccess.get((value as any).data);
+          }
+          GlobalModalSetup.getGlobalModalHolder().alertMessage(
+            'Thông báo',
+            (value as any).data?.message,
+          );
+          return SearchRecipesFailed.get(value.data);
+        }),
+        catchError((error) => {
+          GlobalLoadingSetup.getLoading().isHide();
+          GlobalModalSetup.getGlobalModalHolder().alertMessage(
+            'Thông báo',
+            (error as any).data?.message,
+          );
+          return of(SearchRecipesFailed.get(error.data));
+        }),
+      );
+    }),
+  );
 
 export const profileEpics = combineEpics(
   getProfileRequest$,
@@ -607,4 +641,5 @@ export const profileEpics = combineEpics(
   getFollowPostFav$,
   createRecipeEpic$,
   changePasswordEpic$,
+  getSearchPost$,
 );

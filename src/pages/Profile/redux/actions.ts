@@ -76,3 +76,8 @@ export const ChangePasswordSuccess = defineAction<any>(
   'CHANGE_PASSWORD_SUCCESS',
 );
 export const ChangePasswordFailed = defineAction<any>('CHANGE_PASSWORD_FAILED');
+
+export const SearchRecipes = defineAction<any>('SEARCH_RECIPES')
+export const SearchRecipesSuccess = defineAction<any>('SEARCH_RECIPES_SUCCESS')
+export const SearchRecipesFailed = defineAction<any>('SEARCH_RECIPES_FAILED')
+export const ClearSearch = defineAction<any>('CLEAR_SEARCH')

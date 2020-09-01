@@ -108,13 +108,12 @@ const ProfilePage: React.FC<Props> = (props) => {
   };
 
   const setAva = (data: any) => {
-    dispatch(
-      UpdateInfo.get({
-        userId: user.id,
-        data: {avatar: 'data:image/png;base64,' + data},
-      }),
-    );
-  };
+    dispatch(UpdateInfo.get({
+      userId: user.id,
+      data: { avatar: 'data:image/png;base64,' + data.substring(1) },
+    })
+  )
+  }
 
   return (
     <View style={styles.container}>
@@ -127,21 +126,20 @@ const ProfilePage: React.FC<Props> = (props) => {
             alignItems: 'center',
             marginTop: 20 * ratio,
           }}>
-          <TouchableOpacity activeOpacity={1} onPress={() => updateAva()}>
-            <Image
-              style={{
-                width: 70 * ratio,
-                height: 70 * ratio,
-                marginLeft: 25 * ratio,
-                borderRadius: 35 * ratio,
-              }}
-              source={{
-                uri:
-                  user?.avatar ||
-                  'https://discovery-park.co.uk/wp-content/uploads/2017/06/avatar-default.png',
-              }}
-            />
-          </TouchableOpacity>
+          <View>
+          <Image
+            style={{
+              width: 70 * ratio,
+              height: 70 * ratio,
+              marginLeft: 25 * ratio,
+              borderRadius: 35 * ratio,
+            }}
+            source={{
+              uri:
+              profileInfo?.avatar || 'https://discovery-park.co.uk/wp-content/uploads/2017/06/avatar-default.png',
+            }}
+          />
+          </View>
           <View style={{flexDirection: 'column', marginLeft: 15 * ratio}}>
             <CText bold style={{fontSize: 18 * ratio}}>
               {user.username}
