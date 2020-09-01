@@ -1,27 +1,27 @@
-import { CButton, CHeader, CInput, CText } from 'components';
+import {CButton, CHeader, CInput, CText} from 'components';
 import {
   CATEGORIES,
   COLOR,
   HEADER_TYPE,
   ratio,
-  validationRecipeSchema
+  validationRecipeSchema,
 } from 'config/themeUtils';
-import { Formik } from 'formik';
+import {Formik} from 'formik';
 import React from 'react';
 import {
   FlatList,
-
   StyleSheet,
   TouchableWithoutFeedback,
-  View
+  View,
 } from 'react-native';
-import { RNChipView } from 'react-native-chip-view';
+import {RNChipView} from 'react-native-chip-view';
 import DropDownPicker from 'react-native-dropdown-picker';
-import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
+import {ScrollView, TouchableOpacity} from 'react-native-gesture-handler';
 import Feather from 'react-native-vector-icons/Feather';
-import { useNavigation } from 'react-navigation-hooks';
-import { useDispatch, useSelector } from 'react-redux';
+import {useNavigation} from 'react-navigation-hooks';
+import {useDispatch, useSelector} from 'react-redux';
 import ImageUpload from './imagePicker';
+import {CreateRecipe} from 'pages/Profile/redux/actions';
 
 export interface Props {
   avatar: string;
@@ -49,21 +49,12 @@ const CreatePostPage: React.FC<Props> = (props) => {
   const user = useSelector((state) => state.Auth.user);
   const dispatch = useDispatch();
 
-
-  const submitRecipe = (values: any) => {
-    console.info('value', values);
-    // dispatch(
-    //   CreateRecipe.get({
-    //     ...values,
-    //     ingredients: values.ingredients.join('|'),
-    //     categories: values.categories.join('|'),
-    //     userId: user?.id,
-    //     ration: values.ration.toString()
-    //   })
-    // )
-  };
-
-  const onChangeCategories = (item, isIn, ingres, setFieldValue) => {
+  const onChangeCategories = (
+    item: any,
+    isIn: number,
+    ingres: any[],
+    setFieldValue: (type: string, value: any) => void,
+  ) => {
     if (isIn > -1) {
       ingres.splice(isIn, 1);
     } else {
@@ -72,11 +63,15 @@ const CreatePostPage: React.FC<Props> = (props) => {
     setFieldValue('categories', ingres);
   };
 
-  const addPictureStep = (steps, index, picture, setFieldValue) => {
+  const addPictureStep = (
+    steps: any[],
+    index: number,
+    picture: string,
+    setFieldValue: (type: string, value: any) => void,
+  ) => {
     steps[index].image = picture;
     setFieldValue('steps', steps);
   };
-  
 
   return (
     <View style={styles.container}>
@@ -94,7 +89,7 @@ const CreatePostPage: React.FC<Props> = (props) => {
             avatar: null,
             ration: '1',
             cookingTime: 20,
-            difficultLevel: 'Dễ',
+            difficultLevel: 1,
             ingredients: [''],
             categories: [],
             hashtags: '',
@@ -103,7 +98,16 @@ const CreatePostPage: React.FC<Props> = (props) => {
           isInitialValid={false}
           validationSchema={validationRecipeSchema}
           onSubmit={(values) => {
-            console.info('balu', values);
+            dispatch(
+              CreateRecipe.get({
+                ...values,
+                ingredients: values.ingredients.join('|'),
+                categories: values.categories.join('|'),
+                userId: user?.id,
+                ration: values.ration.toString(),
+                cookingTime: Number(values.cookingTime),
+              }),
+            );
           }}>
           {({
             handleChange,
@@ -120,10 +124,7 @@ const CreatePostPage: React.FC<Props> = (props) => {
               <View
                 style={{marginTop: 28 * ratio, marginHorizontal: 16 * ratio}}>
                 <View>
-                  <ImageUpload
-                    type={'BIG'}
-                    onChange={() => handleChange('avatar')}
-                  />
+                  <ImageUpload type={'BIG'} onChange={handleChange('avatar')} />
                 </View>
                 <View>
                   <CText bold fontSize={18}>
@@ -160,7 +161,7 @@ const CreatePostPage: React.FC<Props> = (props) => {
                       containerStyle={{flex: 1, justifyContent: 'center'}}
                       placeholder={'20'}
                       textSize={14}
-                      value={Number(values.cookingTime)}
+                      value={values.cookingTime.toString()}
                       onChangeText={handleChange('cookingTime')}
                       style={[styles.inputWrap, {width: '90%'}]}
                       keyboardType={'number-pad'}
@@ -185,7 +186,7 @@ const CreatePostPage: React.FC<Props> = (props) => {
                         <CInput
                           placeholder={'4'}
                           textSize={14}
-                          value={Number(values.ration) ? values.ration : ''}
+                          value={values.ration}
                           onChangeText={handleChange('ration')}
                           style={[
                             styles.inputWrap,
@@ -206,9 +207,10 @@ const CreatePostPage: React.FC<Props> = (props) => {
                       </CText>
                       <DropDownPicker
                         items={difficultLevel}
+                        defaultValue={values.difficultLevel}
                         containerStyle={styles.dropdownWrap}
-                        onChangeItem={(item) =>
-                          handleChange('difficultLevel')(item.label)
+                        onChangeItem={(item: any) =>
+                          setFieldValue('difficultLevel', item.value)
                         }
                       />
                     </View>
@@ -230,7 +232,9 @@ const CreatePostPage: React.FC<Props> = (props) => {
                       renderItem={({item, index}) => {
                         const isIn = values.categories.indexOf(item.title);
                         return (
-                          <View style={{marginRight: 5 * ratio}}>
+                          <View
+                            style={{marginRight: 5 * ratio}}
+                            key={`category${index}`}>
                             <RNChipView
                               key={`chip${index}`}
                               title={item.title}
@@ -285,8 +289,13 @@ const CreatePostPage: React.FC<Props> = (props) => {
                               ingres[index] = text;
                               setFieldValue('ingredients', ingres);
                             }}
+                            textError={
+                              errors.ingredients &&
+                              typeof errors.ingredients === 'object' &&
+                              errors.ingredients[index] &&
+                              errors.ingredients[index]
+                            }
                             style={[styles.inputWrap, {width: '90%'}]}
-                           
                           />
                           <TouchableWithoutFeedback
                             onPress={() => {
@@ -302,6 +311,12 @@ const CreatePostPage: React.FC<Props> = (props) => {
                           </TouchableWithoutFeedback>
                         </View>
                       ))}
+                    {errors.ingredients &&
+                      typeof errors.ingredients === 'string' && (
+                        <CText fontSize={12} color="red">
+                          {errors.ingredients}
+                        </CText>
+                      )}
                     <TouchableOpacity
                       onPress={() => {
                         let ingres = values.ingredients;
@@ -329,7 +344,7 @@ const CreatePostPage: React.FC<Props> = (props) => {
                             justifyContent: 'space-between',
                             marginVertical: 10 * ratio,
                           }}
-                          key={Math.random()}>
+                          key={`step${i}`}>
                           <View style={styles.index}>
                             <CText fontSize={14} color={'white'} bold>
                               {i + 1}
@@ -347,11 +362,15 @@ const CreatePostPage: React.FC<Props> = (props) => {
                               onChangeText={(text: string) => {
                                 let steps = values.steps;
                                 steps[i].making = text;
-                                handleChange('steps')(steps)
-                                // setFieldValue('steps', steps);
+                                setFieldValue('steps', steps);
                               }}
                               style={[styles.inputWrap, {width: '90 %'}]}
-                              // textError={errors.steps[i]?.making || ''}
+                              textError={
+                                errors.steps &&
+                                typeof errors.steps === 'object' &&
+                                errors.steps[i]?.making &&
+                                errors.steps[i].making
+                              }
                             />
                             <ImageUpload
                               type={'SMALL'}
@@ -380,14 +399,20 @@ const CreatePostPage: React.FC<Props> = (props) => {
                           </TouchableOpacity>
                         </View>
                       ))}
+                    {errors.steps && typeof errors.steps === 'string' && (
+                      <CText fontSize={12} color="red">
+                        {errors.steps}
+                      </CText>
+                    )}
                     <TouchableOpacity
                       onPress={() => {
-                        // let steps = values.steps;
-                        // steps.push({
-                        //   stt: values.steps.length + 1,
-                        //   making: '',
-                        // });
-                        // setFieldValue('steps', steps);
+                        let steps = values.steps;
+                        steps.push({
+                          stt: values.steps.length + 1,
+                          making: '',
+                          image: null,
+                        });
+                        setFieldValue('steps', steps);
                       }}>
                       <CText bold fontSize={14} color={COLOR.PRIMARY_ACTIVE}>
                         {' '}
@@ -397,11 +422,17 @@ const CreatePostPage: React.FC<Props> = (props) => {
                   </View>
                 </View>
                 <CButton
-                  style={[styles.btnStyle]}
+                  style={[
+                    styles.btnStyle,
+                    {
+                      backgroundColor: isValid
+                        ? COLOR.PRIMARY_ACTIVE
+                        : COLOR.DEACTIVE_GRAY,
+                    },
+                  ]}
                   title="Đăng"
-                  onPress={() => {
-                    console.info(values);
-                  }}
+                  disabled={!isValid}
+                  onPress={handleSubmit}
                 />
               </View>
             );

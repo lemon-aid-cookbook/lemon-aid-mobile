@@ -1,4 +1,5 @@
 import {GlobalLoadingSetup, GlobalModalSetup} from 'components';
+import {TAB_TYPES, MODAL_TYPE} from 'config/themeUtils';
 import {NavigationActions} from 'react-navigation';
 import {Observable} from 'redux';
 import {combineEpics, ofType} from 'redux-observable';
@@ -8,6 +9,15 @@ import {of} from 'rxjs';
 import {catchError, exhaustMap, map} from 'rxjs/operators';
 import {request} from 'utils/network/api';
 import {
+  CommentPost,
+  CommentPostFailed,
+  CommentPostSuccess,
+  CreateRecipe,
+  CreateRecipeFailed,
+  CreateRecipeSuccess,
+  Follow,
+  FollowFailed,
+  FollowSuccess,
   GetDetailPost,
   GetDetailPostFailed,
   GetDetailPostNotNav,
@@ -31,23 +41,19 @@ import {
   LikePost,
   LikePostFailed,
   LikePostSuccess,
+  Unfollow,
+  UnfollowFailed,
+  UnfollowSuccess,
   UnlikePost,
   UnlikePostFailed,
   UnlikePostSuccess,
-  Follow,
-  FollowSuccess,
-  FollowFailed,
-  UnfollowSuccess,
-  UnfollowFailed,
-  Unfollow,
   UpdateInfo,
-  UpdateInfoSuccess,
   UpdateInfoFailed,
-  CommentPost,
-  CommentPostSuccess,
-  CommentPostFailed,
+  UpdateInfoSuccess,
+  ChangePassword,
+  ChangePasswordSuccess,
+  ChangePasswordFailed,
 } from './actions';
-import { TAB_TYPES } from 'config/themeUtils';
 
 const getProfileRequest$ = (action$: Observable<PlainAction>) =>
   action$.pipe(
@@ -116,7 +122,7 @@ const getMostFavRequest$ = (action$: Observable<PlainAction>) =>
 
 const getRecent$ = (action$: Observable<PlainAction>) =>
   action$.pipe(
-    ofType(GetRecent.type,  UnlikePostSuccess.type, LikePostSuccess.type),
+    ofType(GetRecent.type, UnlikePostSuccess.type, LikePostSuccess.type),
     exhaustMap((action: any) => {
       return request<any>({
         method: 'GET',
@@ -174,17 +180,18 @@ const getFollowPost$ = (action$: Observable<PlainAction>) =>
     }),
   );
 
-  const getFollowPostFav$ = (action$: Observable<PlainAction>) =>
+const getFollowPostFav$ = (action$: Observable<PlainAction>) =>
   action$.pipe(
     ofType(GetFollowPost.type, LikePost.type, UnlikePost.type),
     exhaustMap((action: any) => {
       return request<any>({
         method: 'GET',
         url: 'post/getPostsByTabs',
-        param: {userId: action.payload.userId,
+        param: {
+          userId: action.payload.userId,
           limit: 10,
           page: 1,
-          type: TAB_TYPES[2]
+          type: TAB_TYPES[2],
         },
       }).pipe(
         map((value) => {
@@ -272,7 +279,11 @@ const getDetail$ = (action$: Observable<PlainAction>) =>
 
 const getDetailNotNav$ = (action$: Observable<PlainAction>) =>
   action$.pipe(
-    ofType(GetDetailPostNotNav.type, UnlikePostSuccess.type, LikePostSuccess.type),
+    ofType(
+      GetDetailPostNotNav.type,
+      UnlikePostSuccess.type,
+      LikePostSuccess.type,
+    ),
     exhaustMap((action: any) => {
       return request<any>({
         method: 'GET',
@@ -325,7 +336,7 @@ const likePost$ = (action$: Observable<PlainAction>) =>
       }).pipe(
         map((value) => {
           if ((value as any).status === 200) {
-            return LikePostSuccess.get(action.payload)
+            return LikePostSuccess.get(action.payload);
           }
           GlobalModalSetup.getGlobalModalHolder().alertMessage(
             'Thông báo',
@@ -358,7 +369,7 @@ const unlikePost$ = (action$: Observable<PlainAction>) =>
       }).pipe(
         map((value) => {
           if ((value as any).status === 200) {
-            return UnlikePostSuccess.get(action.payload)
+            return UnlikePostSuccess.get(action.payload);
           }
           GlobalModalSetup.getGlobalModalHolder().alertMessage(
             'Thông báo',
@@ -377,7 +388,7 @@ const unlikePost$ = (action$: Observable<PlainAction>) =>
     }),
   );
 
-  const followUser$ = (action$: Observable<PlainAction>) =>
+const followUser$ = (action$: Observable<PlainAction>) =>
   action$.pipe(
     ofType(Follow.type),
     exhaustMap((action: any) => {
@@ -391,8 +402,8 @@ const unlikePost$ = (action$: Observable<PlainAction>) =>
       }).pipe(
         map((value) => {
           if ((value as any).status === 200) {
-            store.dispatch(GetProfile.get(store.getState().Auth.user.username))
-            return FollowSuccess.get(action.payload)
+            store.dispatch(GetProfile.get(store.getState().Auth.user.username));
+            return FollowSuccess.get(action.payload);
           }
           GlobalModalSetup.getGlobalModalHolder().alertMessage(
             'Thông báo',
@@ -425,8 +436,8 @@ const unFollowUser$ = (action$: Observable<PlainAction>) =>
       }).pipe(
         map((value) => {
           if ((value as any).status === 200) {
-            store.dispatch(GetProfile.get(store.getState().Auth.user.username))
-            return UnfollowSuccess.get(action.payload)
+            store.dispatch(GetProfile.get(store.getState().Auth.user.username));
+            return UnfollowSuccess.get(action.payload);
           }
           GlobalModalSetup.getGlobalModalHolder().alertMessage(
             'Thông báo',
@@ -449,7 +460,7 @@ const updateInfo$ = (action$: Observable<PlainAction>) =>
   action$.pipe(
     ofType(UpdateInfo.type),
     exhaustMap((action: any) => {
-      console.info(`user/update/${action.payload.userId}`)
+      console.info(`user/update/${action.payload.userId}`);
       return request<any>({
         method: 'PUT',
         url: `user/update/${action.payload.userId}`,
@@ -459,10 +470,10 @@ const updateInfo$ = (action$: Observable<PlainAction>) =>
         },
       }).pipe(
         map((value) => {
-          console.info(value)
+          console.info(value);
           if ((value as any).status === 200) {
-            store.dispatch(GetProfile.get(store.getState().Auth.user.username))
-            return UpdateInfoSuccess.get(action.payload)
+            store.dispatch(GetProfile.get(store.getState().Auth.user.username));
+            return UpdateInfoSuccess.get(action.payload);
           }
           GlobalModalSetup.getGlobalModalHolder().alertMessage(
             'Thông báo',
@@ -471,7 +482,7 @@ const updateInfo$ = (action$: Observable<PlainAction>) =>
           return UpdateInfoFailed.get(value.data);
         }),
         catchError((error) => {
-          console.info(error)
+          console.info(error);
           GlobalModalSetup.getGlobalModalHolder().alertMessage(
             'Thông báo',
             (error as any).data?.message,
@@ -496,10 +507,8 @@ const commentPost$ = (action$: Observable<PlainAction>) =>
       }).pipe(
         map((value) => {
           if ((value as any).status === 200) {
-            store.dispatch(
-              GetDetailPost.get({ postId: action.payload.postId })
-            )
-            return CommentPostSuccess.get(action.payload)
+            store.dispatch(GetDetailPost.get({postId: action.payload.postId}));
+            return CommentPostSuccess.get(action.payload);
           }
           GlobalModalSetup.getGlobalModalHolder().alertMessage(
             'Thông báo',
@@ -513,6 +522,68 @@ const commentPost$ = (action$: Observable<PlainAction>) =>
             (error as any).data?.message,
           );
           return of(CommentPostFailed.get(error.data));
+        }),
+      );
+    }),
+  );
+
+const createRecipeEpic$ = (action$: Observable<PlainAction>) =>
+  action$.pipe(
+    ofType(CreateRecipe.type),
+    exhaustMap((action: any) => {
+      return request<any>({
+        method: 'POST',
+        url: 'post/create',
+        param: action.payload,
+        option: {
+          format: 'json',
+        },
+      }).pipe(
+        map((result) => {
+          if ((result as any).status === 200) {
+            store.dispatch(GetProfile.get(store.getState().Auth.user.username));
+            store.dispatch(NavigationActions.back());
+            return CreateRecipeSuccess.get(result.data);
+          }
+          return CreateRecipeFailed.get(result);
+        }),
+        catchError((error) => {
+          return CreateRecipeFailed.get(error);
+        }),
+      );
+    }),
+  );
+
+const changePasswordEpic$ = (action$: Observable<PlainAction>) =>
+  action$.pipe(
+    ofType(ChangePassword.type),
+    exhaustMap((action: any) => {
+      return request<any>({
+        method: 'POST',
+        url: 'new-password',
+        param: action.payload,
+        option: {
+          format: 'json',
+        },
+      }).pipe(
+        map((result) => {
+          if (result.status === 200) {
+            store.dispatch(NavigationActions.back());
+            // store.dispatch(SignOut.get());
+            GlobalModalSetup.getGlobalModalHolder().alertMessage(
+              'Thông báo',
+              'Bạn đã đổi mật khẩu thành công.',
+            );
+            return ChangePasswordSuccess.get(result.data);
+          }
+          GlobalModalSetup.getGlobalModalHolder().alertMessage(
+            'Thông báo',
+            result.data.err,
+          );
+          return ChangePasswordFailed.get(result);
+        }),
+        catchError((error) => {
+          return ChangePasswordFailed.get(error);
         }),
       );
     }),
@@ -533,5 +604,7 @@ export const profileEpics = combineEpics(
   unFollowUser$,
   updateInfo$,
   commentPost$,
-  getFollowPostFav$
+  getFollowPostFav$,
+  createRecipeEpic$,
+  changePasswordEpic$,
 );

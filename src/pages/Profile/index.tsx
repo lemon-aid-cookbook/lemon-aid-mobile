@@ -2,7 +2,7 @@ import {CHeader, CText} from 'components';
 import {COLOR, HEADER_TYPE, ratio} from 'config/themeUtils';
 import {SignoutRequest} from 'pages/Login/redux/actions';
 import RecipeItem from 'pages/Search/components/recipeItem';
-import React, { useEffect } from 'react';
+import React, {useEffect} from 'react';
 import {
   FlatList,
   Image,
@@ -15,7 +15,7 @@ import {useNavigation} from 'react-navigation-hooks';
 import {useDispatch, useSelector} from 'react-redux';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import EmptyList from 'pages/Search/components/emptyList';
-import { GetProfile, GetDetailPost, UpdateInfo } from './redux/actions';
+import {GetProfile, GetDetailPost, UpdateInfo} from './redux/actions';
 import ImagePicker from 'react-native-image-picker';
 
 export interface Props {
@@ -72,14 +72,17 @@ const ProfilePage: React.FC<Props> = (props) => {
 
   useEffect(() => {
     if (user) {
-      dispatch(GetProfile.get(user.username))
+      dispatch(GetProfile.get(user.username));
     }
-  }, [])
+  }, []);
 
   const _renderItem = ({item, index}: {item: any; index: string}) => {
-    const recipe = {...item, userAvar: user.avatar , username: user.username}
+    const recipe = {...item, userAvar: user.avatar, username: user.username};
     return (
-      <TouchableOpacity activeOpacity={0.9} onPress={() => dispatch(GetDetailPost.get({ postId: item.id}))} style={{flex: 1}}>
+      <TouchableOpacity
+        activeOpacity={0.9}
+        onPress={() => dispatch(GetDetailPost.get({postId: item.id}))}
+        style={{flex: 1}}>
         <RecipeItem item={recipe} />
       </TouchableOpacity>
     );
@@ -102,15 +105,16 @@ const ProfilePage: React.FC<Props> = (props) => {
       },
       (result) => !result.didCancel && setAva(result.data),
     );
-  }
+  };
 
   const setAva = (data: any) => {
-    dispatch(UpdateInfo.get({
-      userId: user.id,
-      data: { avatar: 'data:image/png;base64,' + data },
-    })
-  )
-  }
+    dispatch(
+      UpdateInfo.get({
+        userId: user.id,
+        data: {avatar: 'data:image/png;base64,' + data},
+      }),
+    );
+  };
 
   return (
     <View style={styles.container}>
@@ -124,18 +128,19 @@ const ProfilePage: React.FC<Props> = (props) => {
             marginTop: 20 * ratio,
           }}>
           <TouchableOpacity activeOpacity={1} onPress={() => updateAva()}>
-          <Image
-            style={{
-              width: 70 * ratio,
-              height: 70 * ratio,
-              marginLeft: 25 * ratio,
-              borderRadius: 35 * ratio,
-            }}
-            source={{
-              uri:
-              user?.avatar || 'https://discovery-park.co.uk/wp-content/uploads/2017/06/avatar-default.png',
-            }}
-          />
+            <Image
+              style={{
+                width: 70 * ratio,
+                height: 70 * ratio,
+                marginLeft: 25 * ratio,
+                borderRadius: 35 * ratio,
+              }}
+              source={{
+                uri:
+                  user?.avatar ||
+                  'https://discovery-park.co.uk/wp-content/uploads/2017/06/avatar-default.png',
+              }}
+            />
           </TouchableOpacity>
           <View style={{flexDirection: 'column', marginLeft: 15 * ratio}}>
             <CText bold style={{fontSize: 18 * ratio}}>
@@ -146,11 +151,12 @@ const ProfilePage: React.FC<Props> = (props) => {
               {user.email}
             </CText>
 
-            <CText
-              style={{fontSize: 18 * ratio, color: 'gold'}}
-              onPress={() => {}}>
-              Chỉnh sửa thông tin cá nhân
-            </CText>
+            <TouchableOpacity onPress={() => navigate('ChangePassword')}>
+              <CText style={{fontSize: 18 * ratio, color: 'gold'}}>
+                Chỉnh sửa thông tin cá nhân
+              </CText>
+            </TouchableOpacity>
+
             <TouchableOpacity
               onPress={() => {
                 dispatch(SignoutRequest.get());
@@ -162,20 +168,36 @@ const ProfilePage: React.FC<Props> = (props) => {
             </TouchableOpacity>
           </View>
         </View>
-        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around'}}>
-        <View style={{ alignItems: 'center', justifyContent: 'center'}}>
-            <CText bold fontSize={18}>{profileInfo?.Posts.length || 0}</CText>
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-around',
+          }}>
+          <View style={{alignItems: 'center', justifyContent: 'center'}}>
+            <CText bold fontSize={18}>
+              {profileInfo?.Posts.length || 0}
+            </CText>
             <CText>bài đăng</CText>
           </View>
-          <TouchableOpacity activeOpacity={0.9} style={{ alignItems: 'center', justifyContent: 'center'}} onPress={() => navigate('Followers')}>
-            <CText bold fontSize={18}>{profileInfo?.followers.length || 0}</CText>
+          <TouchableOpacity
+            activeOpacity={0.9}
+            style={{alignItems: 'center', justifyContent: 'center'}}
+            onPress={() => navigate('Followers')}>
+            <CText bold fontSize={18}>
+              {profileInfo?.followers.length || 0}
+            </CText>
             <CText>người theo dõi</CText>
           </TouchableOpacity>
-          <TouchableOpacity activeOpacity={0.9} style={{ alignItems: 'center', justifyContent: 'center'}} onPress={() => navigate('Followings')}>
-            <CText bold fontSize={18}>{profileInfo?.followings.length || 0}</CText>
+          <TouchableOpacity
+            activeOpacity={0.9}
+            style={{alignItems: 'center', justifyContent: 'center'}}
+            onPress={() => navigate('Followings')}>
+            <CText bold fontSize={18}>
+              {profileInfo?.followings.length || 0}
+            </CText>
             <CText>đang theo dõi</CText>
           </TouchableOpacity>
-
         </View>
         <CText
           bold
