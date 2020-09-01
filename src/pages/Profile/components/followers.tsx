@@ -5,13 +5,11 @@ import React from 'react';
 import {FlatList, Image, StyleSheet, View} from 'react-native';
 import {useNavigation} from 'react-navigation-hooks';
 import {useDispatch, useSelector} from 'react-redux';
-import { Unfollow, Follow } from '../redux/actions';
+import {Unfollow, Follow} from '../redux/actions';
 
 const FollowerPage: React.FC<Props> = (props) => {
   const {goBack, navigate} = useNavigation();
-  const followers = useSelector(
-    (state) => state.Profile.profileInfo.followers,
-  );
+  const followers = useSelector((state) => state.Profile.profileInfo.followers);
   const followings = useSelector(
     (state) => state.Profile.profileInfo.followings,
   );
@@ -51,7 +49,7 @@ const FollowerPage: React.FC<Props> = (props) => {
         </View>
         <CButton
           textColor={COLOR.PRIMARY_ACTIVE}
-          title={checkFollow(item) ? 'Đang theo dõi' : 'Theo dõi'}
+          title={checkFollow(item.user) ? 'Đang theo dõi' : 'Theo dõi'}
           style={styles.btnStyle}
           onPress={() => onUnfollow(item.user)}
         />
@@ -59,46 +57,56 @@ const FollowerPage: React.FC<Props> = (props) => {
     );
   };
 
-  const checkFollow = (user:any) => {
-    if (user && followings.find(item => item.user.username === user.username)){
-      return true
+  const checkFollow = (fl: any) => {
+    if (
+      user &&
+      followings.find((item: any) => item.user.username === fl.username)
+    ) {
+      return true;
     } else {
-      return false
+      return false;
     }
-  }
+  };
 
   const onUnfollow = (item: any) => {
-        if (user) {
-          const val = {
-            userId: user.id,
-            limit: 10,
-            page: 1,
-            type: TAB_TYPES[2],
-            followerId: item.id
-          }
-          if (checkFollow(item) === true) {
-            dispatch(
-              Unfollow.get(val)
-            )
-          } else {
-            dispatch(Follow.get(val))
-          }
-        }
+    if (user) {
+      const val = {
+        userId: user.id,
+        followerId: item.id,
+      };
+      if (checkFollow(item) === true) {
+        dispatch(Unfollow.get(val));
+      } else {
+        dispatch(Follow.get(val));
+      }
+    }
   };
 
   return (
     <View style={styles.container}>
-      <CHeader headerTitle="Người theo dõi" type={HEADER_TYPE.NORMAL} isShowLeft
-        onLeftPress={() => goBack()}/>
+      <CHeader
+        headerTitle="Người theo dõi"
+        type={HEADER_TYPE.NORMAL}
+        isShowLeft
+        onLeftPress={() => goBack()}
+      />
       <View style={styles.listWrap}>
         <FlatList
           data={followers}
-          keyExtractor={(index) => index.toString()}
+          keyExtractor={(item, index) => item.id}
           renderItem={_renderItem}
           showsVerticalScrollIndicator={false}
           ListEmptyComponent={() => <EmptyList />}
-          ItemSeparatorComponent={() => <View style={{ height: 1 * ratio, backgroundColor: '#DADADA', width: '100%', marginHorizontal: 16 * ratio}}/>}
-          contentContainerStyle={{ marginTop: 16 * ratio}}
+          ItemSeparatorComponent={() => (
+            <View
+              style={{
+                height: 1 * ratio,
+                backgroundColor: '#DADADA',
+                marginHorizontal: 16 * ratio,
+              }}
+            />
+          )}
+          contentContainerStyle={{marginTop: 16 * ratio}}
         />
       </View>
     </View>

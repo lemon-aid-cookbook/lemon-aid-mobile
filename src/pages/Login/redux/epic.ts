@@ -1,4 +1,6 @@
 import {GlobalLoadingSetup, GlobalModalSetup} from 'components';
+import {MODAL_TYPE} from 'config/themeUtils';
+import {GetProfile} from 'pages/Profile/redux/actions';
 import {NavigationActions} from 'react-navigation';
 import {Observable} from 'redux';
 import {combineEpics, ofType} from 'redux-observable';
@@ -11,13 +13,10 @@ import {
   LoginRequest,
   LoginRequestFailed,
   LoginRequestSuccess,
+  SignoutRequest,
   SignupRequest,
   SignupRequestFailed,
-  SignupRequestSuccess,
-  SignoutRequest,
 } from './actions';
-import {MODAL_TYPE} from 'config/themeUtils';
-import { GetProfile } from 'pages/Profile/redux/actions';
 
 const loginRequest$ = (action$: Observable<PlainAction>) =>
   action$.pipe(
@@ -35,15 +34,20 @@ const loginRequest$ = (action$: Observable<PlainAction>) =>
         map((value) => {
           GlobalLoadingSetup.getLoading().isHide();
           if ((value as any).status === 200) {
-            return LoginRequestSuccess.get((value as any).data);            
+            return LoginRequestSuccess.get((value as any).data);
           }
+          GlobalLoadingSetup.getLoading().isHide();
+          GlobalModalSetup.getGlobalModalHolder().alertMessage(
+            'Thông báo',
+            (value as any).data?.err,
+          );
           return LoginRequestFailed.get(value.data);
         }),
         catchError((error) => {
           GlobalLoadingSetup.getLoading().isHide();
           GlobalModalSetup.getGlobalModalHolder().alertMessage(
             'Thông báo',
-            (error as any).data?.message,
+            (error as any).data?.err,
           );
           return of(LoginRequestFailed.get(error.data));
         }),
@@ -82,8 +86,12 @@ const signupRequest$ = (action$: Observable<PlainAction>) =>
               NavigationActions.navigate({
                 routeName: 'Login',
               }),
-            )
+            );
           }
+          GlobalModalSetup.getGlobalModalHolder().alertMessage(
+            'Thông báo',
+            (value as any).data?.message,
+          );
           return SignupRequestFailed.get(value.data);
         }),
         catchError((error) => {
@@ -98,7 +106,7 @@ const signupRequest$ = (action$: Observable<PlainAction>) =>
     }),
   );
 
-  const signOutRequest$ = (action$: Observable<PlainAction>) =>
+const signOutRequest$ = (action$: Observable<PlainAction>) =>
   action$.pipe(
     ofType(SignoutRequest.type),
     map(() => {
@@ -110,11 +118,11 @@ const signupRequest$ = (action$: Observable<PlainAction>) =>
     }),
   );
 
-  const logInSuccess$ = (action$: Observable<PlainAction>) =>
+const logInSuccess$ = (action$: Observable<PlainAction>) =>
   action$.pipe(
     ofType(LoginRequestSuccess.type),
     map((action: any) => {
-      store.dispatch(GetProfile.get(action.payload.user.username))
+      store.dispatch(GetProfile.get(action.payload.user.username));
       return store.dispatch(
         NavigationActions.navigate({
           routeName: 'Profile',
@@ -122,4 +130,9 @@ const signupRequest$ = (action$: Observable<PlainAction>) =>
       );
     }),
   );
-export const authEpics = combineEpics(loginRequest$, signupRequest$, signOutRequest$, logInSuccess$);
+export const authEpics = combineEpics(
+  loginRequest$,
+  signupRequest$,
+  signOutRequest$,
+  logInSuccess$,
+);

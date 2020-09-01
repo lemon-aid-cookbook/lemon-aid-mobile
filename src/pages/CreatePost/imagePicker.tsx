@@ -26,8 +26,8 @@ const ImageUpload: React.FC<Props> = (props) => {
       },
       (result) => {
         if (!result.didCancel) {
-          props.onChange('data:image/jpeg;base64,' + result.data);
-          setImage(result.data);
+          props.onChange(`data:${result.type};base64,${result.data}`);
+          setImage(`data:${result.type};base64,${result.data}`);
         }
       },
     );
@@ -54,7 +54,7 @@ const ImageUpload: React.FC<Props> = (props) => {
             <Image
               resizeMode={'cover'}
               source={{
-                uri: `data:image/png;base64,${image}`,
+                uri: image,
               }}
               style={{
                 width: props.type === 'BIG' ? '100%' : 100 * ratio,

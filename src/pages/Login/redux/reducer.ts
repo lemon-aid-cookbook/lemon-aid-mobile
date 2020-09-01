@@ -15,7 +15,10 @@ export function authReducer(
     case LoginRequestSuccess.type:
       return {...state, token: action.payload.token, user: action.payload.user};
     case SignoutRequest.type:
-      return {};
+      return {
+        token: null,
+        user: null,
+      };
     default:
       return state;
   }
