@@ -87,7 +87,7 @@ const CreatePostPage: React.FC<Props> = (props) => {
             title: '',
             description: '',
             avatar: null,
-            ration: '1',
+            ration: 1,
             cookingTime: 20,
             difficultLevel: 1,
             ingredients: [''],
@@ -126,6 +126,14 @@ const CreatePostPage: React.FC<Props> = (props) => {
                 <View>
                   <ImageUpload type={'BIG'} onChange={handleChange('avatar')} />
                 </View>
+                {errors.avatar && (
+                  <CText
+                    fontSize={12}
+                    color="red"
+                    style={{marginBottom: 12 * ratio}}>
+                    {errors.avatar}
+                  </CText>
+                )}
                 <View>
                   <CText bold fontSize={18}>
                     Tiêu đề
@@ -146,7 +154,11 @@ const CreatePostPage: React.FC<Props> = (props) => {
                     textSize={14}
                     value={values.description}
                     onChangeText={handleChange('description')}
-                    style={styles.inputWrap}
+                    style={[
+                      styles.inputWrap,
+                      {height: 80 * ratio, paddingVertical: 8 * ratio},
+                    ]}
+                    multiline
                   />
                   <CText bold fontSize={18}>
                     Thời gian nấu
@@ -174,7 +186,7 @@ const CreatePostPage: React.FC<Props> = (props) => {
                   <View
                     style={{
                       flexDirection: 'row',
-                      alignItems: 'center',
+                      alignItems: 'flex-start',
                       justifyContent: 'space-between',
                     }}>
                     <View>
@@ -186,7 +198,7 @@ const CreatePostPage: React.FC<Props> = (props) => {
                         <CInput
                           placeholder={'4'}
                           textSize={14}
-                          value={values.ration}
+                          value={values.ration.toString()}
                           onChangeText={handleChange('ration')}
                           style={[
                             styles.inputWrap,
@@ -224,6 +236,7 @@ const CreatePostPage: React.FC<Props> = (props) => {
                       flexDirection: 'row',
                       justifyContent: 'space-between',
                       alignItems: 'center',
+                      marginVertical: 12 * ratio,
                     }}>
                     <FlatList
                       horizontal

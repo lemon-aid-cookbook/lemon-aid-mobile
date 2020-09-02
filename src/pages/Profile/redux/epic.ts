@@ -1,5 +1,6 @@
 import {GlobalLoadingSetup, GlobalModalSetup} from 'components';
 import {TAB_TYPES} from 'config/themeUtils';
+import {SignoutRequest} from 'pages/Login/redux/actions';
 import {NavigationActions} from 'react-navigation';
 import {Observable} from 'redux';
 import {combineEpics, ofType} from 'redux-observable';
@@ -44,6 +45,9 @@ import {
   LikePost,
   LikePostFailed,
   LikePostSuccess,
+  SearchRecipes,
+  SearchRecipesFailed,
+  SearchRecipesSuccess,
   Unfollow,
   UnfollowFailed,
   UnfollowSuccess,
@@ -53,9 +57,6 @@ import {
   UpdateInfo,
   UpdateInfoFailed,
   UpdateInfoSuccess,
-  SearchRecipes,
-  SearchRecipesSuccess,
-  SearchRecipesFailed,
 } from './actions';
 
 const getProfileRequest$ = (action$: Observable<PlainAction>) =>
@@ -463,6 +464,7 @@ const updateInfo$ = (action$: Observable<PlainAction>) =>
   action$.pipe(
     ofType(UpdateInfo.type),
     exhaustMap((action: any) => {
+      GlobalLoadingSetup.getLoading().isVisible();
       return request<any>({
         method: 'PUT',
         url: `user/update/${action.payload.userId}`,
@@ -472,7 +474,7 @@ const updateInfo$ = (action$: Observable<PlainAction>) =>
         },
       }).pipe(
         map((value) => {
-          console.info(value);
+          GlobalLoadingSetup.getLoading().isHide();
           if ((value as any).status === 200) {
             store.dispatch(GetProfile.get(store.getState().Auth.user.username));
             return UpdateInfoSuccess.get(action.payload);
@@ -484,7 +486,7 @@ const updateInfo$ = (action$: Observable<PlainAction>) =>
           return UpdateInfoFailed.get(value.data);
         }),
         catchError((error) => {
-          console.info(error);
+          GlobalLoadingSetup.getLoading().isHide();
           GlobalModalSetup.getGlobalModalHolder().alertMessage(
             'Thông báo',
             (error as any).data?.message,
@@ -544,7 +546,6 @@ const createRecipeEpic$ = (action$: Observable<PlainAction>) =>
         map((result) => {
           if ((result as any).status === 200) {
             store.dispatch(GetProfile.get(store.getState().Auth.user.username));
-            store.dispatch(NavigationActions.back());
             return CreateRecipeSuccess.get(result.data);
           }
           return CreateRecipeFailed.get(result);
@@ -553,6 +554,14 @@ const createRecipeEpic$ = (action$: Observable<PlainAction>) =>
           return CreateRecipeFailed.get(error);
         }),
       );
+    }),
+  );
+
+const createPostSuccess$ = (action$: Observable<PlainAction>) =>
+  action$.pipe(
+    ofType(CreateRecipeSuccess.type),
+    map(() => {
+      return store.dispatch(NavigationActions.back());
     }),
   );
 
@@ -570,12 +579,6 @@ const changePasswordEpic$ = (action$: Observable<PlainAction>) =>
       }).pipe(
         map((result) => {
           if (result.status === 200) {
-            store.dispatch(NavigationActions.back());
-            // store.dispatch(SignOut.get());
-            GlobalModalSetup.getGlobalModalHolder().alertMessage(
-              'Thông báo',
-              'Bạn đã đổi mật khẩu thành công.',
-            );
             return ChangePasswordSuccess.get(result.data);
           }
           GlobalModalSetup.getGlobalModalHolder().alertMessage(
@@ -590,6 +593,15 @@ const changePasswordEpic$ = (action$: Observable<PlainAction>) =>
       );
     }),
   );
+
+const changePasswordSuccess$ = (action$: Observable<PlainAction>) =>
+  action$.pipe(
+    ofType(ChangePasswordSuccess.type),
+    map(() => {
+      return SignoutRequest.get();
+    }),
+  );
+
 const getSearchPost$ = (action$: Observable<PlainAction>) =>
   action$.pipe(
     ofType(SearchRecipes.type),
@@ -642,4 +654,6 @@ export const profileEpics = combineEpics(
   createRecipeEpic$,
   changePasswordEpic$,
   getSearchPost$,
+  changePasswordSuccess$,
+  createPostSuccess$,
 );

@@ -20,6 +20,7 @@ const validationSchema = yup.object().shape({
   email: yup
     .string()
     .trim()
+    .max(48, 'Email không được quá 48 kí tự')
     .label('Email')
     .email('Email không hợp lệ')
     .required('* Vui lòng nhập email'),

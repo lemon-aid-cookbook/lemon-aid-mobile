@@ -21,12 +21,15 @@ const validationSchema = yup.object().shape({
   email: yup
     .string()
     .trim()
+    .max(48, 'Email không được quá 48 kí tự')
     .label('Email')
     .email('Email không hợp lệ')
     .required('* Vui lòng nhập email'),
   password: yup
     .string()
     .required('* Vui lòng nhập mật khẩu')
+    .min(8, 'Mật khẩu gồm 8 kí tự trở lên')
+    .max(48, 'Mật khẩu không vượt quá 48 kí tự')
     .matches(/(?=.{8,})/, {
       message: 'Mật khẩu phải gồm 8 kí tự',
     }),
@@ -37,7 +40,16 @@ const validationSchema = yup.object().shape({
       [yup.ref('password'), null],
       'Mật khẩu nhập lại phải khớp với mật khẩu đã nhập',
     ),
-  username: yup.string().trim().required('* Vui lòng nhập tên đăng nhập'),
+  username: yup
+    .string()
+    .trim()
+    .required('* Vui lòng nhập tên đăng nhập')
+    .min(3, 'Tên đăng nhập từ 3 kí tự trở lên')
+    .max(16, 'Tên đăng nhập không được quá 16 kí tự')
+    .matches(
+      /(?=[a-zA-Z0-9._]{3,16}$)(?!.*[_.]{2})[^_.].*[^_.]$/,
+      'Tên đăng nhập không hợp lệ',
+    ),
 });
 
 const SignUpPage: React.FC<Props> = (props) => {
@@ -56,7 +68,7 @@ const SignUpPage: React.FC<Props> = (props) => {
         <CText
           bold
           fontSize={28 * ratio}
-          style={{ marginTop: 80 * ratio, marginHorizontal: 16 * ratio}}>
+          style={{marginTop: 80 * ratio, marginHorizontal: 16 * ratio}}>
           Đăng ký
         </CText>
         <Formik
