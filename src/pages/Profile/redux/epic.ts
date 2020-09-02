@@ -22,6 +22,9 @@ import {
   Follow,
   FollowFailed,
   FollowSuccess,
+  GetAnotherProfile,
+  GetAnotherProfileFailed,
+  GetAnotherProfileSuccess,
   GetDetailPost,
   GetDetailPostFailed,
   GetDetailPostNotNav,
@@ -57,6 +60,9 @@ import {
   UpdateInfo,
   UpdateInfoFailed,
   UpdateInfoSuccess,
+  GetUserPost,
+  GetUserPostSuccess,
+  GetUserPostFailed,
 } from './actions';
 
 const getProfileRequest$ = (action$: Observable<PlainAction>) =>
@@ -71,6 +77,14 @@ const getProfileRequest$ = (action$: Observable<PlainAction>) =>
         map((value) => {
           GlobalLoadingSetup.getLoading().isHide();
           if ((value as any).status === 200) {
+            store.dispatch(
+              GetUserPost.get({
+                userId: (value as any).data.userData.id,
+                limit: 10,
+                page: 1,
+                type: TAB_TYPES[0],
+              }),
+            );
             return GetProfileSuccess.get((value as any).data.userData);
           }
           GlobalModalSetup.getGlobalModalHolder().alertMessage(
@@ -86,6 +100,46 @@ const getProfileRequest$ = (action$: Observable<PlainAction>) =>
             (error as any).data?.message,
           );
           return of(GetProfileFailed.get(error.data));
+        }),
+      );
+    }),
+  );
+
+const getAnotherProfileRequest$ = (action$: Observable<PlainAction>) =>
+  action$.pipe(
+    ofType(GetAnotherProfile.type),
+    exhaustMap((action: any) => {
+      GlobalLoadingSetup.getLoading().isVisible();
+      return request<any>({
+        method: 'GET',
+        url: `user/${action.payload}`,
+      }).pipe(
+        map((value) => {
+          GlobalLoadingSetup.getLoading().isHide();
+          if ((value as any).status === 200) {
+            store.dispatch(
+              GetUserPost.get({
+                userId: (value as any).data.userData.id,
+                limit: 10,
+                page: 1,
+                type: TAB_TYPES[0],
+              }),
+            );
+            return GetAnotherProfileSuccess.get((value as any).data.userData);
+          }
+          GlobalModalSetup.getGlobalModalHolder().alertMessage(
+            'Thông báo',
+            (value as any).data?.message,
+          );
+          return GetAnotherProfileFailed.get(value.data);
+        }),
+        catchError((error) => {
+          GlobalLoadingSetup.getLoading().isHide();
+          GlobalModalSetup.getGlobalModalHolder().alertMessage(
+            'Thông báo',
+            (error as any).data?.message,
+          );
+          return of(GetAnotherProfileFailed.get(error.data));
         }),
       );
     }),
@@ -244,6 +298,41 @@ const getFavoritePost$ = (action$: Observable<PlainAction>) =>
             (error as any).data?.message,
           );
           return of(GetFavoritePostFailed.get(error.data));
+        }),
+      );
+    }),
+  );
+
+const getUserPost$ = (action$: Observable<PlainAction>) =>
+  action$.pipe(
+    ofType(GetUserPost.type),
+    exhaustMap((action: any) => {
+      return request<any>({
+        method: 'GET',
+        url: 'post/getPostsByTabs',
+        param: action.payload,
+      }).pipe(
+        map((value) => {
+          if ((value as any).status === 200) {
+            const val = {
+              posts: (value as any).data.posts,
+              totalItems: (value as any).data.totalItems,
+              page: action.payload.page,
+            };
+            return GetUserPostSuccess.get(val);
+          }
+          GlobalModalSetup.getGlobalModalHolder().alertMessage(
+            'Thông báo',
+            (value as any).data?.message,
+          );
+          return GetUserPostFailed.get(value.data);
+        }),
+        catchError((error) => {
+          GlobalModalSetup.getGlobalModalHolder().alertMessage(
+            'Thông báo',
+            (error as any).data?.message,
+          );
+          return of(GetUserPostFailed.get(error.data));
         }),
       );
     }),
@@ -656,4 +745,6 @@ export const profileEpics = combineEpics(
   getSearchPost$,
   changePasswordSuccess$,
   createPostSuccess$,
+  getAnotherProfileRequest$,
+  getUserPost$,
 );

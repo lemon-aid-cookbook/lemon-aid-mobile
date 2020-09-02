@@ -1,10 +1,14 @@
 export interface ProfileState {
   profileInfo: any;
+  anotherProfile: any;
   mostFavPost: any;
   recentPost: any;
   followPost: any;
   favPost: any;
   detailPost: any;
   searchResult: any[];
-  totalItems: number
+  userPost: any[];
+  totalUserPost: number;
+  totalItems: number;
+  userPage: number;
 }
