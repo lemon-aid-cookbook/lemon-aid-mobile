@@ -17,7 +17,7 @@ const LoadingPage: React.FC<Props> = (props) => {
     } else {
       navigate('Login');
     }
-  }, []);
+  }, [user]);
 
   return (
     <View style={styles.container}>

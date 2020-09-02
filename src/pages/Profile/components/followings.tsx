@@ -5,7 +5,7 @@ import React from 'react';
 import {FlatList, Image, StyleSheet, View} from 'react-native';
 import {useNavigation} from 'react-navigation-hooks';
 import {useDispatch, useSelector} from 'react-redux';
-import { Unfollow } from '../redux/actions';
+import {Unfollow} from '../redux/actions';
 
 const FollowingPage: React.FC<Props> = (props) => {
   const {goBack, navigate} = useNavigation();
@@ -58,23 +58,22 @@ const FollowingPage: React.FC<Props> = (props) => {
 
   const onUnfollow = (item: any) => {
     if (user) {
-        const val = {
-          userId: user.id,
-          limit: 10,
-          page: 1,
-          type: TAB_TYPES[2],
-          followerId: item.id
-        }
-        dispatch(
-            Unfollow.get(val)
-          )
-      }
+      const val = {
+        userId: user.id,
+        followerId: item.id,
+      };
+      dispatch(Unfollow.get(val));
+    }
   };
 
   return (
     <View style={styles.container}>
-      <CHeader headerTitle="Đang theo dõi" type={HEADER_TYPE.NORMAL} isShowLeft
-        onLeftPress={() => goBack()}/>
+      <CHeader
+        headerTitle="Đang theo dõi"
+        type={HEADER_TYPE.NORMAL}
+        isShowLeft
+        onLeftPress={() => goBack()}
+      />
       <View style={styles.listWrap}>
         <FlatList
           data={followings}
@@ -82,8 +81,16 @@ const FollowingPage: React.FC<Props> = (props) => {
           renderItem={_renderItem}
           showsVerticalScrollIndicator={false}
           ListEmptyComponent={() => <EmptyList />}
-          ItemSeparatorComponent={() => <View style={{ height: 1 * ratio, backgroundColor: '#DADADA', width: '100%', marginHorizontal: 16 * ratio}}/>}
-          contentContainerStyle={{ marginTop: 16 * ratio}}
+          ItemSeparatorComponent={() => (
+            <View
+              style={{
+                height: 1 * ratio,
+                backgroundColor: '#DADADA',
+                marginHorizontal: 16 * ratio,
+              }}
+            />
+          )}
+          contentContainerStyle={{marginTop: 16 * ratio}}
         />
       </View>
     </View>

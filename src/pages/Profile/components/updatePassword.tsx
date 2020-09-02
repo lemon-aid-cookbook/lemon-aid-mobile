@@ -43,8 +43,13 @@ const ChangePasswordPage: React.FC<Props> = (props) => {
   const user = useSelector((state) => state.Auth.user);
   const dispatch = useDispatch();
 
-  const onChangePassword = (values) => {
+  const onChangePassword = (values: any) => {
     dispatch(ChangePassword.get({...values, userId: user.id}));
+  };
+
+  let inputs = {};
+  const focusTheField = (id) => {
+    inputs[id].focus();
   };
 
   return (
@@ -55,7 +60,6 @@ const ChangePasswordPage: React.FC<Props> = (props) => {
         isShowLeft
         onLeftPress={() => goBack()}
       />
-
       <Formik
         initialValues={{
           oldPassword: '',
@@ -78,34 +82,48 @@ const ChangePasswordPage: React.FC<Props> = (props) => {
           return (
             <View style={styles.listWrap}>
               <CInput
-                // containerStyle={{flex: 1, justifyContent: 'center'}}
                 placeholder={'Mật khẩu cũ'}
                 textSize={14}
                 value={values.oldPassword}
+                onBlur={handleBlur('oldPassword')}
                 onChangeText={handleChange('oldPassword')}
                 textError={errors.oldPassword}
-                style={[styles.inputWrap, {width: '90%'}]}
+                style={styles.inputWrap}
                 secureTextEntry
+                returnKeyType={'next'}
+                onSubmitEditing={() => {
+                  focusTheField('newPassword');
+                }}
               />
               <CInput
-                // containerStyle={{flex: 1, justifyContent: 'center'}}
                 placeholder={'Mật khẩu mới'}
                 textSize={14}
                 value={values.newPassword}
+                onBlur={handleBlur('newPassword')}
                 onChangeText={handleChange('newPassword')}
                 textError={errors.newPassword}
-                style={[styles.inputWrap, {width: '90%'}]}
+                style={styles.inputWrap}
                 secureTextEntry
+                returnKeyType={'next'}
+                onSubmitEditing={() => {
+                  focusTheField('confirmPassword');
+                }}
+                ref={(input) => {
+                  inputs['newPassword'] = input;
+                }}
               />
               <CInput
-                // containerStyle={{flex: 1, justifyContent: 'center'}}
                 placeholder={'Nhập lại mật khẩu mới'}
                 textSize={14}
                 value={values.confirmPassword}
+                onBlur={handleBlur('confirmPassword')}
                 onChangeText={handleChange('confirmPassword')}
                 textError={errors.confirmPassword}
-                style={[styles.inputWrap, {width: '90%'}]}
+                style={styles.inputWrap}
                 secureTextEntry
+                ref={(input) => {
+                  inputs['confirmPassword'] = input;
+                }}
               />
               <CButton
                 style={[
@@ -154,14 +172,14 @@ const styles = StyleSheet.create({
     shadowRadius: 10,
     alignItems: 'center',
     justifyContent: 'center',
-    marginVertical: 20 * ratio,
+    marginVertical: 28 * ratio,
   },
   inputWrap: {
-    width: '100%',
+    width: '90%',
     height: 45 * ratio,
     borderWidth: 1 * ratio,
     borderColor: '#DADADA',
     borderRadius: 9 * ratio,
-    marginVertical: 8 * ratio,
+    marginTop: 16 * ratio,
   },
 });
