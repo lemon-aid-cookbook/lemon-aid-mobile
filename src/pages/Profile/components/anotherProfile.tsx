@@ -1,27 +1,24 @@
-import {CHeader, CText, RoyalModal} from 'components';
+import {CHeader, CText} from 'components';
 import {COLOR, HEADER_TYPE, ratio, TAB_TYPES} from 'config/themeUtils';
-import {SignoutRequest} from 'pages/Login/redux/actions';
 import EmptyList from 'pages/Search/components/emptyList';
 import RecipeItem from 'pages/Search/components/recipeItem';
 import React, {useEffect, useState} from 'react';
-import {
-  FlatList,
-  Image,
-  StyleSheet,
-  TouchableWithoutFeedback,
-  View,
-} from 'react-native';
+import {FlatList, Image, StyleSheet, View} from 'react-native';
 import {TouchableOpacity} from 'react-native-gesture-handler';
-import ImagePicker from 'react-native-image-picker';
-import Feather from 'react-native-vector-icons/Feather';
-import {useNavigation, useIsFocused} from 'react-navigation-hooks';
+import {StackActions} from 'react-navigation';
+import {
+  useIsFocused,
+  useNavigation,
+  useNavigationParam,
+} from 'react-navigation-hooks';
 import {useDispatch, useSelector} from 'react-redux';
 import {
+  Follow,
+  GetAnotherProfile,
   GetDetailPost,
-  GetProfile,
-  UpdateInfo,
+  Unfollow,
   GetUserPost,
-} from './redux/actions';
+} from '../redux/actions';
 
 export interface Props {
   avatar: string;
@@ -69,80 +66,67 @@ const defaultProps = {
   ],
 };
 
-const ProfilePage: React.FC<Props> = (props) => {
+const AnotherProfilePage: React.FC<Props> = (props) => {
+  const username = useNavigationParam('username') || null;
   const {goBack, navigate} = useNavigation();
   const user = useSelector((state) => state.Auth.user);
   const profile = useSelector((state) => state.Profile);
-  const {profileInfo, userPost, totalUserPost, userPage} = profile;
+  const {anotherProfile, userPost, totalUserPost, userPage} = profile;
+  const followings = useSelector(
+    (state) => state.Profile.profileInfo.followings,
+  );
   const dispatch = useDispatch();
-  const [refreshing, setRefreshing] = useState(false);
   const isFocused = useIsFocused();
-  const [isShowModal, setShowModal] = useState(false);
-  const [detailItem, setDetailItem] = useState({})
+
+  const [refreshing, setRefreshing] = useState(false);
+
+  const isFollowing =
+    user &&
+    followings &&
+    followings.some((item: any) => item.user.username === username);
 
   useEffect(() => {
-    if (user && isFocused) {
-      dispatch(GetProfile.get(user.username));
+    if (username && isFocused) {
+      dispatch(GetAnotherProfile.get(username));
     }
-  }, [isFocused]);
+  }, [isFocused, isFollowing]);
 
   const _renderItem = ({item, index}: {item: any; index: string}) => {
     const recipe = {
       ...item,
-      userAvar: profileInfo.avatar,
-      username: user.username,
+      userAvar: anotherProfile.avatar,
+      username: anotherProfile.username,
     };
     return (
       <TouchableOpacity
         activeOpacity={0.9}
         onPress={() => dispatch(GetDetailPost.get({postId: item.id}))}
-        style={{flex: 1}}
-        onLongPress={() => {
-          setDetailItem(item);
-          setShowModal(true)
-        }}>
+        style={{flex: 1}}>
         <RecipeItem item={recipe} />
       </TouchableOpacity>
     );
   };
 
-  const renderFloatingBtn = () => {
-    return (
-      <TouchableWithoutFeedback onPress={() => navigate('CreatePost')}>
-        <View style={styles.floatingBtn}>
-          <Feather name={'plus'} size={24 * ratio} color={'white'} />
-        </View>
-      </TouchableWithoutFeedback>
-    );
-  };
-
-  const updateAva = () => {
-    ImagePicker.showImagePicker(
-      {
-        maxWidth: 512,
-      },
-      (result) => {
-        if (!result.didCancel) {
-          setAva(`data:${result.type};base64,${result.data}`);
-        }
-      },
-    );
-  };
-
-  const setAva = (data: any) => {
-    dispatch(
-      UpdateInfo.get({
-        userId: user.id,
-        data: {avatar: data},
-      }),
-    );
+  const onFollow = () => {
+    const val = {
+      userId: user.id,
+      limit: 10,
+      page: 1,
+      type: TAB_TYPES[2],
+      followerId: anotherProfile.id,
+    };
+    if (isFollowing) {
+      dispatch(Unfollow.get(val));
+    } else {
+      dispatch(Follow.get(val));
+    }
   };
 
   const handleLoadMore = () => {
     if (isFocused && userPost.length < totalUserPost) {
       dispatch(
         GetUserPost.get({
-          userId: user.id,
+          userId: anotherProfile.id,
           limit: 10,
           page: userPage + 1,
           type: TAB_TYPES[0],
@@ -151,49 +135,40 @@ const ProfilePage: React.FC<Props> = (props) => {
     }
   };
 
-  if (!user) {
+  if (!anotherProfile || anotherProfile.username !== username) {
     return <View />;
   }
 
   return (
     <View style={styles.container}>
-      <CHeader headerTitle="Trang cá nhân" type={HEADER_TYPE.NORMAL} />
+      <CHeader
+        headerTitle="Trang cá nhân"
+        type={HEADER_TYPE.NORMAL}
+        isShowLeft
+        onLeftPress={() => goBack()}
+      />
       <View style={styles.listWrap}>
         <View style={styles.profileView}>
-          <TouchableOpacity style={{flex: 2}} onPress={updateAva}>
-            <Image
-              style={styles.avatar}
-              source={{
-                uri:
-                  profileInfo?.avatar ||
-                  'https://discovery-park.co.uk/wp-content/uploads/2017/06/avatar-default.png',
-              }}
-            />
-          </TouchableOpacity>
+          <Image
+            style={styles.avatar}
+            source={{
+              uri:
+                anotherProfile?.avatar ||
+                'https://discovery-park.co.uk/wp-content/uploads/2017/06/avatar-default.png',
+            }}
+          />
           <View style={styles.infoView}>
             <CText bold style={{fontSize: 18 * ratio}}>
-              {user.username}
+              {anotherProfile.username}
             </CText>
-            <CText style={{fontSize: 16 * ratio, color: 'grey'}}>
-              {user.email}
-            </CText>
-            <View style={{flexDirection: 'row', marginTop: 4 * ratio}}>
-              <TouchableOpacity onPress={() => navigate('ChangePassword')}>
-                <CText style={{fontSize: 18 * ratio, color: 'gold'}}>
-                  Đổi mật khẩu
-                </CText>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={{marginLeft: 24 * ratio}}
-                onPress={() => {
-                  dispatch(SignoutRequest.get());
-                }}>
+            {user && (
+              <TouchableOpacity onPress={onFollow}>
                 <CText
                   style={{fontSize: 18 * ratio, color: COLOR.PRIMARY_ACTIVE}}>
-                  Đăng xuất
+                  {isFollowing ? 'Đang theo dõi' : 'Theo dõi'}
                 </CText>
               </TouchableOpacity>
-            </View>
+            )}
           </View>
         </View>
         <View
@@ -201,28 +176,49 @@ const ProfilePage: React.FC<Props> = (props) => {
             flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'space-around',
+            marginTop: 8 * ratio,
           }}>
           <View style={styles.flView}>
             <CText bold fontSize={18}>
-              {profileInfo?.Posts.length || 0}
+              {anotherProfile?.Posts.length || 0}
             </CText>
             <CText>bài đăng</CText>
           </View>
           <TouchableOpacity
             activeOpacity={0.9}
             style={styles.flView}
-            onPress={() => navigate('Followers')}>
+            onPress={() =>
+              dispatch(
+                StackActions.push({
+                  routeName: 'AnotherFollowers',
+                  params: {
+                    title: 'Người theo dõi',
+                    followers: anotherProfile?.followers,
+                  },
+                }),
+              )
+            }>
             <CText bold fontSize={18}>
-              {profileInfo?.followers.length || 0}
+              {anotherProfile?.followers.length || 0}
             </CText>
             <CText>người theo dõi</CText>
           </TouchableOpacity>
           <TouchableOpacity
             activeOpacity={0.9}
             style={styles.flView}
-            onPress={() => navigate('Followings')}>
+            onPress={() =>
+              dispatch(
+                StackActions.push({
+                  routeName: 'AnotherFollowers',
+                  params: {
+                    title: 'Đang theo dõi',
+                    followers: anotherProfile?.followings,
+                  },
+                }),
+              )
+            }>
             <CText bold fontSize={18}>
-              {profileInfo?.followings.length || 0}
+              {anotherProfile?.followings.length || 0}
             </CText>
             <CText>đang theo dõi</CText>
           </TouchableOpacity>
@@ -235,12 +231,12 @@ const ProfilePage: React.FC<Props> = (props) => {
             paddingVertical: 20 * ratio,
             paddingLeft: 24 * ratio,
           }}>
-          Công thức của bạn
+          Công thức của {username}
         </CText>
         <FlatList
           data={userPost}
           keyExtractor={(item, index) => item.id}
-          onRefresh={() => dispatch(GetProfile.get(user.username))}
+          onRefresh={() => dispatch(GetAnotherProfile.get(username))}
           refreshing={refreshing}
           renderItem={_renderItem}
           showsVerticalScrollIndicator={false}
@@ -249,22 +245,12 @@ const ProfilePage: React.FC<Props> = (props) => {
           onEndReached={handleLoadMore}
         />
       </View>
-      <View>{renderFloatingBtn()}</View>
-      <RoyalModal
-        item={detailItem}
-        isShow={isShowModal}
-        onCancel={(val) => setShowModal(val)}
-        onDelete={(value) => {
-          console.info('delete');
-        }}
-        onEdit={(val) => console.info('edit', val.item)}
-      />
     </View>
   );
 };
 
-ProfilePage.defaultProps = defaultProps;
-export default ProfilePage;
+AnotherProfilePage.defaultProps = defaultProps;
+export default AnotherProfilePage;
 
 const styles = StyleSheet.create({
   container: {

@@ -1,16 +1,9 @@
-import {CHeader, CText} from 'components';
-import {COLOR, HEADER_TYPE, ratio} from 'config/themeUtils';
+import {CHeader} from 'components';
+import {HEADER_TYPE, ratio} from 'config/themeUtils';
 import React, {useState} from 'react';
-import {
-  Image,
-  ScrollView,
-  StyleSheet,
-  TouchableWithoutFeedback,
-  View,
-} from 'react-native';
-import {TouchableOpacity} from 'react-native-gesture-handler';
-import AntDesign from 'react-native-vector-icons/AntDesign';
+import {Share, StyleSheet, View} from 'react-native';
 import {useNavigation} from 'react-navigation-hooks';
+import {useSelector} from 'react-redux';
 import TabViewComponent from './components/tabBarWrap';
 export interface Props {
   detailRecipe: any;
@@ -41,7 +34,28 @@ const defaultProps = {
 
 const DetailPage: React.FC<Props> = (props) => {
   const {goBack, navigate} = useNavigation();
-  const [isFavorite, setFavorite] = useState(false);
+  const [isShowModal, setShowModal] = useState(false);
+  const profile = useSelector((state) => state.Profile);
+  const {detailPost} = profile;
+
+  const onShare = async () => {
+    try {
+      const result = await Share.share({
+        message: `https://lemon-aid-cookbook.github.io/#/recipe/${detailPost.id}`,
+      });
+      if (result.action === Share.sharedAction) {
+        if (result.activityType) {
+          // shared with activity type of result.activityType
+        } else {
+          // shared
+        }
+      } else if (result.action === Share.dismissedAction) {
+        // dismissed
+      }
+    } catch (error) {
+      console.info('error');
+    }
+  };
 
   return (
     <View style={styles.container} key={Math.random()}>
@@ -52,10 +66,12 @@ const DetailPage: React.FC<Props> = (props) => {
         onLeftPress={() => goBack()}
         isShowRight
         rightIcon={'share'}
-        onRightPress={() => console.info('share')}
+        onRightPress={() => {
+          onShare();
+        }}
       />
       <View style={styles.listWrap}>
-      <TabViewComponent />
+        <TabViewComponent />
       </View>
     </View>
   );

@@ -6,6 +6,7 @@ import CInput from './TextInput';
 import CButton from './Button';
 import AnimatedInput from './AnimatedInput';
 import {GlobalModal, GlobalModalSetup} from './GlobalModal';
+import RoyalModal from './RoyalModal'
 export {
   CHeader,
   CText,
@@ -17,4 +18,5 @@ export {
   GlobalModalSetup,
   CButton,
   AnimatedInput,
+  RoyalModal
 };

@@ -10,13 +10,14 @@ import {
   View,
 } from 'react-native';
 import {StackActions} from 'react-navigation';
-import {useNavigation} from 'react-navigation-hooks';
+import {useNavigation, useNavigationParam} from 'react-navigation-hooks';
 import {useDispatch, useSelector} from 'react-redux';
 import {Follow, Unfollow} from '../redux/actions';
 
-const FollowerPage: React.FC<Props> = (props) => {
+const AnotherFollowerPage: React.FC<Props> = (props) => {
   const {goBack, navigate} = useNavigation();
-  const followers = useSelector((state) => state.Profile.profileInfo.followers);
+  const headerTitle = useNavigationParam('title') || 'Người theo dõi';
+  const followers = useNavigationParam('followers') || [];
   const followings = useSelector(
     (state) => state.Profile.profileInfo.followings,
   );
@@ -26,6 +27,7 @@ const FollowerPage: React.FC<Props> = (props) => {
   const _renderItem = ({item, index}: {item: any; index: string}) => {
     return (
       <TouchableOpacity
+        disabled={user && user.username === item.user.username}
         onPress={() =>
           dispatch(
             StackActions.push({
@@ -39,6 +41,7 @@ const FollowerPage: React.FC<Props> = (props) => {
           flexDirection: 'row',
           alignItems: 'center',
           justifyContent: 'space-between',
+          marginVertical: 10 * ratio,
         }}>
         <View
           style={{
@@ -62,12 +65,14 @@ const FollowerPage: React.FC<Props> = (props) => {
 
           <CText fontSize={16}>{item.user.username}</CText>
         </View>
-        <CButton
-          textColor={COLOR.PRIMARY_ACTIVE}
-          title={checkFollow(item.user) ? 'Đang theo dõi' : 'Theo dõi'}
-          style={styles.btnStyle}
-          onPress={() => onUnfollow(item.user)}
-        />
+        {user && user.username !== item.user.username && (
+          <CButton
+            textColor={COLOR.PRIMARY_ACTIVE}
+            title={checkFollow(item.user) ? 'Đang theo dõi' : 'Theo dõi'}
+            style={styles.btnStyle}
+            onPress={() => onUnfollow(item.user)}
+          />
+        )}
       </TouchableOpacity>
     );
   };
@@ -103,7 +108,7 @@ const FollowerPage: React.FC<Props> = (props) => {
   return (
     <View style={styles.container}>
       <CHeader
-        headerTitle="Người theo dõi"
+        headerTitle={headerTitle}
         type={HEADER_TYPE.NORMAL}
         isShowLeft
         onLeftPress={() => goBack()}
@@ -131,7 +136,7 @@ const FollowerPage: React.FC<Props> = (props) => {
   );
 };
 
-export default FollowerPage;
+export default AnotherFollowerPage;
 
 const styles = StyleSheet.create({
   container: {
@@ -151,7 +156,6 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     alignItems: 'center',
     justifyContent: 'center',
-    marginVertical: 10 * ratio,
     borderColor: COLOR.PRIMARY_ACTIVE,
     borderWidth: 1 * ratio,
   },
