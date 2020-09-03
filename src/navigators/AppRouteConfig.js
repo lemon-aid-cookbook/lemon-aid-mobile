@@ -1,12 +1,18 @@
-import {COLOR, ratio} from 'config/themeUtils';
+import {COLOR, DEVICE_WIDTH, ratio} from 'config/themeUtils';
 import CameraPage from 'pages/Camera';
+import CreatePostPage from 'pages/CreatePost';
 import DetailPage from 'pages/DetailRecipe';
 import FavoritePage from 'pages/Favorite';
 import LoginPage from 'pages/Login';
 import ForgotPasswordPage from 'pages/Login/components/forgotPassword.page';
 import LoadingPage from 'pages/Login/components/loading.page';
 import ProfilePage from 'pages/Profile';
+import AnotherProfilePage from 'pages/Profile/components/anotherProfile';
+import FollowerPage from 'pages/Profile/components/followers';
+import FollowingPage from 'pages/Profile/components/followings';
+import ChangePasswordPage from 'pages/Profile/components/updatePassword';
 import SearchPage from 'pages/Search';
+import SearchDetailPage from 'pages/Search/components/searchDetail';
 import SignUpPage from 'pages/SignUp';
 import SplashScreen from 'pages/Splash';
 import React from 'react';
@@ -15,12 +21,7 @@ import Feather from 'react-native-vector-icons/Feather';
 import {createAppContainer, createSwitchNavigator} from 'react-navigation';
 import {createStackNavigator} from 'react-navigation-stack';
 import {createBottomTabNavigator} from 'react-navigation-tabs';
-import {DEVICE_WIDTH} from 'config/themeUtils';
-import CreatePostPage from 'pages/CreatePost';
-import FollowingPage from 'pages/Profile/components/followings';
-import FollowerPage from 'pages/Profile/components/followers';
-import ChangePasswordPage from 'pages/Profile/components/updatePassword';
-import SearchDetailPage from 'pages/Search/components/searchDetail';
+import AnotherFollowerPage from 'pages/Profile/components/anotherFollowers';
 const CameraStack = createStackNavigator(
   {
     Camera: {screen: CameraPage},
@@ -90,10 +91,12 @@ const LoginStack = createStackNavigator(
 const ProfileStack = createStackNavigator(
   {
     ProfilePage: ProfilePage,
+    AnotherProfile: AnotherProfilePage,
     CreatePost: CreatePostPage,
     Detail: DetailPage,
     Followings: FollowingPage,
     Followers: FollowerPage,
+    AnotherFollowers: AnotherFollowerPage,
     ChangePassword: ChangePasswordPage,
   },
   {

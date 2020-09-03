@@ -60,6 +60,9 @@ const FollowingPage: React.FC<Props> = (props) => {
     if (user) {
       const val = {
         userId: user.id,
+        limit: 10,
+        page: 1,
+        type: TAB_TYPES[2],
         followerId: item.id,
       };
       dispatch(Unfollow.get(val));

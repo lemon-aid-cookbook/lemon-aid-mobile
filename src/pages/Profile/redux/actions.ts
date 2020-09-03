@@ -26,6 +26,10 @@ export const GetFollowPost = defineAction<any>('GET_FOLLOW_REQUEST');
 export const GetFollowPostSuccess = defineAction<any>('GET_FOLLOW_SUCCESS');
 export const GetFollowPostFailed = defineAction<any>('GET_FOLLOW_FAILED');
 
+export const GetUserPost = defineAction<any>('GET_USER_POST_REQUEST');
+export const GetUserPostSuccess = defineAction<any>('GET_USER_POST_SUCCESS');
+export const GetUserPostFailed = defineAction<any>('GET_USER_POST_FAILED');
+
 export const GetFavoritePost = defineAction<any>('GET_FAVORITE_REQUEST');
 export const GetFavoritePostSuccess = defineAction<any>('GET_FAVORITE_SUCCESS');
 export const GetFavoritePostFailed = defineAction<any>('GET_FAVORITE_FAILED');
@@ -77,7 +81,7 @@ export const ChangePasswordSuccess = defineAction<any>(
 );
 export const ChangePasswordFailed = defineAction<any>('CHANGE_PASSWORD_FAILED');
 
-export const SearchRecipes = defineAction<any>('SEARCH_RECIPES')
-export const SearchRecipesSuccess = defineAction<any>('SEARCH_RECIPES_SUCCESS')
-export const SearchRecipesFailed = defineAction<any>('SEARCH_RECIPES_FAILED')
-export const ClearSearch = defineAction<any>('CLEAR_SEARCH')
+export const SearchRecipes = defineAction<any>('SEARCH_RECIPES');
+export const SearchRecipesSuccess = defineAction<any>('SEARCH_RECIPES_SUCCESS');
+export const SearchRecipesFailed = defineAction<any>('SEARCH_RECIPES_FAILED');
+export const ClearSearch = defineAction<any>('CLEAR_SEARCH');
