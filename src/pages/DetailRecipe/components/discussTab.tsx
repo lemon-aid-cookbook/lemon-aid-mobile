@@ -39,8 +39,9 @@ const DiscussTab: React.FC<Props> = (props) => {
   const {goBack, navigate} = useNavigation();
   const [cmt, setCmt] = useState('');
   const [replyCmt, setReplyCmt] = useState('');
-  const detailPost = useSelector((state) => state.Profile.detailPost);
   const user = useSelector((state) => state.Auth.user);
+  const profile = useSelector((state) => state.Profile);
+  const {profileInfo, detailPost} = profile;
   const dispatch = useDispatch();
   const [reply, setReply] = useState(-1)
 
@@ -56,7 +57,7 @@ const DiscussTab: React.FC<Props> = (props) => {
           }}>
           <Image
             source={{
-              uri: user?.avatar || 'https://source.unsplash.com/random',
+              uri: profileInfo?.avatar || 'https://source.unsplash.com/random',
             }}
             style={styles.avaWrap}
           />

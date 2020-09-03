@@ -1,4 +1,4 @@
-import {CHeader, CText} from 'components';
+import {CHeader, CText, RoyalModal} from 'components';
 import {COLOR, HEADER_TYPE, ratio, TAB_TYPES} from 'config/themeUtils';
 import {SignoutRequest} from 'pages/Login/redux/actions';
 import EmptyList from 'pages/Search/components/emptyList';
@@ -77,6 +77,8 @@ const ProfilePage: React.FC<Props> = (props) => {
   const dispatch = useDispatch();
   const [refreshing, setRefreshing] = useState(false);
   const isFocused = useIsFocused();
+  const [isShowModal, setShowModal] = useState(false);
+  const [detailItem, setDetailItem] = useState({})
 
   useEffect(() => {
     if (user && isFocused) {
@@ -94,7 +96,11 @@ const ProfilePage: React.FC<Props> = (props) => {
       <TouchableOpacity
         activeOpacity={0.9}
         onPress={() => dispatch(GetDetailPost.get({postId: item.id}))}
-        style={{flex: 1}}>
+        style={{flex: 1}}
+        onLongPress={() => {
+          setDetailItem(item);
+          setShowModal(true)
+        }}>
         <RecipeItem item={recipe} />
       </TouchableOpacity>
     );
@@ -244,6 +250,15 @@ const ProfilePage: React.FC<Props> = (props) => {
         />
       </View>
       <View>{renderFloatingBtn()}</View>
+      <RoyalModal
+        item={detailItem}
+        isShow={isShowModal}
+        onCancel={(val) => setShowModal(val)}
+        onDelete={(value) => {
+          console.info('delete');
+        }}
+        onEdit={(val) => console.info('edit', val.item)}
+      />
     </View>
   );
 };
