@@ -4,7 +4,6 @@ import {Formik} from 'formik';
 import {SignupRequest} from 'pages/Login/redux/actions';
 import React from 'react';
 import {
-  Image,
   ScrollView,
   StatusBar,
   StyleSheet,
@@ -187,7 +186,7 @@ const SignUpPage: React.FC<Props> = (props) => {
                   title="Đăng ký"
                   onPress={handleSubmit}
                 />
-                <View style={styles.addButton}>
+                {/* <View style={styles.addButton}>
                   <CText fontSize={18 * ratio}>Đăng ký với</CText>
                   <TouchableOpacity onPress={() => {}}>
                     <Image
@@ -195,7 +194,7 @@ const SignUpPage: React.FC<Props> = (props) => {
                       style={{width: 92, height: 64}}
                     />
                   </TouchableOpacity>
-                </View>
+                </View> */}
               </View>
             );
           }}

@@ -1,7 +1,7 @@
 import {GlobalLoadingSetup, GlobalModalSetup} from 'components';
 import {MODAL_TYPE} from 'config/themeUtils';
 import {GetProfile} from 'pages/Profile/redux/actions';
-import {NavigationActions} from 'react-navigation';
+import {NavigationActions, StackActions} from 'react-navigation';
 import {Observable} from 'redux';
 import {combineEpics, ofType} from 'redux-observable';
 import {PlainAction} from 'redux-typed-actions';
@@ -16,6 +16,9 @@ import {
   SignoutRequest,
   SignupRequest,
   SignupRequestFailed,
+  ForgotPassword,
+  ForgotPasswordSuccess,
+  ForgotPasswordFailed,
 } from './actions';
 
 const loginRequest$ = (action$: Observable<PlainAction>) =>
@@ -50,6 +53,48 @@ const loginRequest$ = (action$: Observable<PlainAction>) =>
             (error as any).data?.err,
           );
           return of(LoginRequestFailed.get(error.data));
+        }),
+      );
+    }),
+  );
+
+const forgotPasswordRequest$ = (action$: Observable<PlainAction>) =>
+  action$.pipe(
+    ofType(ForgotPassword.type),
+    exhaustMap((action: any) => {
+      GlobalLoadingSetup.getLoading().isVisible();
+      return request<any>({
+        method: 'POST',
+        url: 'reset-password',
+        param: action.payload,
+        option: {
+          format: 'json',
+        },
+      }).pipe(
+        map((value) => {
+          GlobalLoadingSetup.getLoading().isHide();
+          if ((value as any).status === 200) {
+            GlobalLoadingSetup.getLoading().isHide();
+            GlobalModalSetup.getGlobalModalHolder().alertMessage(
+              'Thông báo',
+              'Vui lòng kiểm tra email để thay đổi mật khẩu',
+            );
+            return ForgotPasswordSuccess.get((value as any).data);
+          }
+          GlobalLoadingSetup.getLoading().isHide();
+          GlobalModalSetup.getGlobalModalHolder().alertMessage(
+            'Thông báo',
+            (value as any).data?.err,
+          );
+          return ForgotPasswordFailed.get(value.data);
+        }),
+        catchError((error) => {
+          GlobalLoadingSetup.getLoading().isHide();
+          GlobalModalSetup.getGlobalModalHolder().alertMessage(
+            'Thông báo',
+            (error as any).data?.err,
+          );
+          return of(ForgotPasswordFailed.get(error.data));
         }),
       );
     }),
@@ -130,9 +175,19 @@ const logInSuccess$ = (action$: Observable<PlainAction>) =>
       );
     }),
   );
+
+const forgotSuccess$ = (action$: Observable<PlainAction>) =>
+  action$.pipe(
+    ofType(ForgotPasswordSuccess.type),
+    map((action: any) => {
+      return store.dispatch(StackActions.pop());
+    }),
+  );
 export const authEpics = combineEpics(
   loginRequest$,
   signupRequest$,
   signOutRequest$,
   logInSuccess$,
+  forgotPasswordRequest$,
+  forgotSuccess$,
 );
