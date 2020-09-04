@@ -69,6 +69,9 @@ import {
   DeleteRecipe,
   DeleteRecipeSuccess,
   DeleteRecipeFailed,
+  DeleteComment,
+  DeleteCommentSuccess,
+  DeleteCommentFailed,
 } from './actions';
 
 const getProfileRequest$ = (action$: Observable<PlainAction>) =>
@@ -599,6 +602,7 @@ const commentPost$ = (action$: Observable<PlainAction>) =>
   action$.pipe(
     ofType(CommentPost.type),
     exhaustMap((action: any) => {
+      GlobalLoadingSetup.getLoading().isVisible();
       return request<any>({
         method: 'POST',
         url: 'user/comment',
@@ -608,8 +612,11 @@ const commentPost$ = (action$: Observable<PlainAction>) =>
         },
       }).pipe(
         map((value) => {
+          GlobalLoadingSetup.getLoading().isHide();
           if ((value as any).status === 200) {
-            store.dispatch(GetDetailPost.get({postId: action.payload.postId}));
+            store.dispatch(
+              GetDetailPostNotNav.get({postId: action.payload.postId}),
+            );
             return CommentPostSuccess.get(action.payload);
           }
           GlobalModalSetup.getGlobalModalHolder().alertMessage(
@@ -619,11 +626,51 @@ const commentPost$ = (action$: Observable<PlainAction>) =>
           return CommentPostFailed.get(value.data);
         }),
         catchError((error) => {
+          GlobalLoadingSetup.getLoading().isHide();
           GlobalModalSetup.getGlobalModalHolder().alertMessage(
             'Thông báo',
             (error as any).data?.message,
           );
           return of(CommentPostFailed.get(error.data));
+        }),
+      );
+    }),
+  );
+
+const deleteComment$ = (action$: Observable<PlainAction>) =>
+  action$.pipe(
+    ofType(DeleteComment.type),
+    exhaustMap((action: any) => {
+      GlobalLoadingSetup.getLoading().isVisible();
+      return request<any>({
+        method: 'POST',
+        url: 'user/deletecomment',
+        param: action.payload.data,
+        option: {
+          format: 'json',
+        },
+      }).pipe(
+        map((value) => {
+          GlobalLoadingSetup.getLoading().isHide();
+          if ((value as any).status === 200) {
+            store.dispatch(
+              GetDetailPostNotNav.get({postId: action.payload.postId}),
+            );
+            return DeleteCommentSuccess.get(action.payload);
+          }
+          GlobalModalSetup.getGlobalModalHolder().alertMessage(
+            'Thông báo',
+            (value as any).data?.message,
+          );
+          return DeleteCommentFailed.get(value.data);
+        }),
+        catchError((error) => {
+          GlobalLoadingSetup.getLoading().isHide();
+          GlobalModalSetup.getGlobalModalHolder().alertMessage(
+            'Thông báo',
+            (error as any).data?.message,
+          );
+          return of(DeleteCommentFailed.get(error.data));
         }),
       );
     }),
@@ -816,4 +863,5 @@ export const profileEpics = combineEpics(
   getUserPost$,
   updateRecipeEpic$,
   deleteRecipeEpic$,
+  deleteComment$,
 );

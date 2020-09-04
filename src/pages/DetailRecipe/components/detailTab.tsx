@@ -1,22 +1,26 @@
-import {CHeader, CText} from 'components';
-import {COLOR, HEADER_TYPE, ratio, TAB_TYPES} from 'config/themeUtils';
+import {CText} from 'components';
+import {COLOR, ratio, TAB_TYPES} from 'config/themeUtils';
+import {
+  Follow,
+  GetDetailPostNotNav,
+  LikePost,
+  Unfollow,
+  UnlikePost,
+} from 'pages/Profile/redux/actions';
 import React, {useState} from 'react';
 import {
   Image,
+  RefreshControl,
   ScrollView,
   StyleSheet,
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
+import {RNChipView} from 'react-native-chip-view';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import {useNavigation} from 'react-navigation-hooks';
-import {useSelector, useDispatch, shallowEqual} from 'react-redux';
-import {RNChipView} from 'react-native-chip-view';
-import {userInfo} from 'os';
-import { dispatch } from 'rxjs/internal/observable/pairs';
-import { UnlikePost, LikePost, Unfollow, Follow, GetFollowPost } from 'pages/Profile/redux/actions';
-import { store } from 'reduxs';
+import {useDispatch, useSelector} from 'react-redux';
 
 export interface Props {
   detailRecipe: any;
@@ -49,10 +53,12 @@ const defaultProps = {
 const DetailTab: React.FC<Props> = (props) => {
   const {goBack, navigate} = useNavigation();
   const detailPost = useSelector((state) => state.Profile.detailPost);
-  const followings = useSelector((state) => state.Profile.profileInfo?.followings)
+  const followings = useSelector(
+    (state) => state.Profile.profileInfo?.followings,
+  );
   const user = useSelector((state) => state.Auth.user);
-  const dispatch = useDispatch()
-
+  const dispatch = useDispatch();
+  const [refreshing] = useState(false);
 
   const renderProfile = () => {
     return (
@@ -78,7 +84,9 @@ const DetailTab: React.FC<Props> = (props) => {
             {detailPost.author?.username}
           </CText>
           {user && detailPost.author?.username !== user?.username && (
-            <TouchableOpacity activeOpacity={0.8} onPress={() => handleFollow()}>
+            <TouchableOpacity
+              activeOpacity={0.8}
+              onPress={() => handleFollow()}>
               <CText fontSize={14} color={COLOR.PRIMARY_ACTIVE}>
                 {checkFollow() ? 'Đang theo dõi' : 'Theo dõi'}
               </CText>
@@ -96,17 +104,15 @@ const DetailTab: React.FC<Props> = (props) => {
         limit: 10,
         page: 1,
         type: TAB_TYPES[2],
-        followerId: detailPost.userId
-      }
+        followerId: detailPost.userId,
+      };
       if (checkFollow() === true) {
-        dispatch(
-          Unfollow.get(val)
-        )
+        dispatch(Unfollow.get(val));
       } else {
-        dispatch(Follow.get(val))
+        dispatch(Follow.get(val));
       }
     }
-  }
+  };
 
   const renderInge = () => {
     return (
@@ -197,17 +203,19 @@ const DetailTab: React.FC<Props> = (props) => {
               return (
                 <View
                   style={{marginHorizontal: 8 * ratio, marginTop: 6 * ratio}}>
-                  {item.length > 0 && <RNChipView
-                    title={item}
-                    avatar={false}
-                    titleStyle={{
-                      fontSize: 14 * ratio,
-                      color: 'white',
-                      fontFamily: 'Cabin-Regular',
-                      fontWeight: 'normal',
-                    }}
-                    backgroundColor={COLOR.PRIMARY_ACTIVE}
-                  />}
+                  {item.length > 0 && (
+                    <RNChipView
+                      title={item}
+                      avatar={false}
+                      titleStyle={{
+                        fontSize: 14 * ratio,
+                        color: 'white',
+                        fontFamily: 'Cabin-Regular',
+                        fontWeight: 'normal',
+                      }}
+                      backgroundColor={COLOR.PRIMARY_ACTIVE}
+                    />
+                  )}
                 </View>
               );
             })}
@@ -217,40 +225,57 @@ const DetailTab: React.FC<Props> = (props) => {
   };
 
   const checkFavorite = () => {
-    if (user && detailPost.likes.find(item => item.user.username === user?.username)){
-      return true
+    if (
+      user &&
+      detailPost.likes.find((item) => item.user.username === user?.username)
+    ) {
+      return true;
     } else {
-      return false
+      return false;
     }
-  }
+  };
 
   const checkFollow = () => {
-    if (user && followings.find(item => item.user.username === detailPost?.author.username)){
-      return true
+    if (
+      user &&
+      followings.find(
+        (item) => item.user.username === detailPost?.author.username,
+      )
+    ) {
+      return true;
     } else {
-      return false
+      return false;
     }
-  }
+  };
 
   const onTouchFav = () => {
     if (user) {
-    const val = {
-      userId: user.id,
-      postId: detailPost.id,
-      limit: 10,
-      page: 1,
-      type: TAB_TYPES[1]
+      const val = {
+        userId: user.id,
+        postId: detailPost.id,
+        limit: 10,
+        page: 1,
+        type: TAB_TYPES[1],
+      };
+      checkFavorite() === true
+        ? dispatch(UnlikePost.get(val))
+        : dispatch(LikePost.get(val));
     }
-      checkFavorite() === true ? dispatch(UnlikePost.get(val)) : dispatch(LikePost.get(val))
-    }
-  }
+  };
+
+  const onRefreshDetail = () => {
+    dispatch(GetDetailPostNotNav.get({postId: detailPost.id}));
+  };
 
   return (
     <View style={styles.container} key={detailPost.likes}>
       <ScrollView
         contentContainerStyle={{marginBottom: 16 * ratio}}
         style={styles.listWrap}
-        showsVerticalScrollIndicator={false}>
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefreshDetail} />
+        }>
         <View>
           <Image
             source={{
@@ -263,7 +288,10 @@ const DetailTab: React.FC<Props> = (props) => {
             }}
           />
 
-          <TouchableWithoutFeedback onPress={() => {onTouchFav()}}>
+          <TouchableWithoutFeedback
+            onPress={() => {
+              onTouchFav();
+            }}>
             <View style={styles.favoriteWrap}>
               <AntDesign
                 name={checkFavorite() ? 'heart' : 'hearto'}
@@ -295,8 +323,8 @@ const DetailTab: React.FC<Props> = (props) => {
             </CText>
           </View>
         </View>
-        <View style={{ flexDirection: 'row', flexWrap: 'wrap'}}>
-        <CText style={{ flex: 1}} fontSize={16}>
+        <View style={{flexDirection: 'row', flexWrap: 'wrap'}}>
+          <CText style={{flex: 1}} fontSize={16}>
             {detailPost.description || ''}
           </CText>
         </View>
@@ -322,7 +350,7 @@ const DetailTab: React.FC<Props> = (props) => {
             Khẩu phần:
           </CText>
           <CText fontSize={14} color={'black'}>
-          {detailPost.ration || 1} người
+            {detailPost.ration || 1} người
           </CText>
         </View>
         <View style={{flexDirection: 'row', alignItems: 'center'}}>
@@ -331,14 +359,14 @@ const DetailTab: React.FC<Props> = (props) => {
             bold
             color={'black'}
             style={{marginRight: 3 * ratio}}>
-             Độ khó:
+            Độ khó:
           </CText>
           <CText fontSize={14} color={'black'}>
-          {detailPost.difficultLevel === 1
-            ? 'Dễ'
-            : detailPost.difficultLevel === 2
-            ? 'Trung bình'
-            : 'Khó'}
+            {detailPost.difficultLevel === 1
+              ? 'Dễ'
+              : detailPost.difficultLevel === 2
+              ? 'Trung bình'
+              : 'Khó'}
           </CText>
         </View>
         {renderCategory()}
