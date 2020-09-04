@@ -177,6 +177,7 @@ const AnotherProfilePage: React.FC<Props> = (props) => {
             alignItems: 'center',
             justifyContent: 'space-around',
             marginTop: 8 * ratio,
+            marginBottom: 16 * ratio,
           }}>
           <View style={styles.flView}>
             <CText bold fontSize={18}>
@@ -223,7 +224,7 @@ const AnotherProfilePage: React.FC<Props> = (props) => {
             <CText>đang theo dõi</CText>
           </TouchableOpacity>
         </View>
-        <CText
+        {/* <CText
           bold
           fontSize={22}
           style={{
@@ -232,7 +233,7 @@ const AnotherProfilePage: React.FC<Props> = (props) => {
             paddingLeft: 24 * ratio,
           }}>
           Công thức của {username}
-        </CText>
+        </CText> */}
         <FlatList
           data={userPost}
           keyExtractor={(item, index) => item.id}

@@ -1,7 +1,7 @@
 import {GlobalLoadingSetup, GlobalModalSetup} from 'components';
 import {TAB_TYPES} from 'config/themeUtils';
 import {SignoutRequest} from 'pages/Login/redux/actions';
-import {NavigationActions} from 'react-navigation';
+import {NavigationActions, StackActions} from 'react-navigation';
 import {Observable} from 'redux';
 import {combineEpics, ofType} from 'redux-observable';
 import {PlainAction} from 'redux-typed-actions';
@@ -63,6 +63,15 @@ import {
   GetUserPost,
   GetUserPostSuccess,
   GetUserPostFailed,
+  UpdateRecipeSuccess,
+  UpdateRecipe,
+  UpdateRecipeFailed,
+  DeleteRecipe,
+  DeleteRecipeSuccess,
+  DeleteRecipeFailed,
+  DeleteComment,
+  DeleteCommentSuccess,
+  DeleteCommentFailed,
 } from './actions';
 
 const getProfileRequest$ = (action$: Observable<PlainAction>) =>
@@ -153,12 +162,16 @@ const getMostFavRequest$ = (action$: Observable<PlainAction>) =>
       return request<any>({
         method: 'GET',
         url: 'post/search',
-        param: {sort: 'common', limit: 10, page: 1},
+        param: {sort: 'common', limit: 10, page: action.payload?.page || 1},
       }).pipe(
         map((value) => {
           GlobalLoadingSetup.getLoading().isHide();
           if ((value as any).status === 200) {
-            return GetMostFaveSuccess.get((value as any).data);
+            const data = {
+              posts: (value as any).data.posts,
+              page: action.payload?.page || 1
+            }
+            return GetMostFaveSuccess.get(data);
           }
           GlobalModalSetup.getGlobalModalHolder().alertMessage(
             'Thông báo',
@@ -185,11 +198,15 @@ const getRecent$ = (action$: Observable<PlainAction>) =>
       return request<any>({
         method: 'GET',
         url: 'post/search',
-        param: {sort: 'latest', limit: 10, page: 1},
+        param: {sort: 'latest', limit: 10, page: action.payload?.page || 1},
       }).pipe(
         map((value) => {
           if ((value as any).status === 200) {
-            return GetRecentSuccess.get((value as any).data);
+            const data = {
+              posts: (value as any).data.posts,
+              page: action.payload?.page || 1
+            }
+            return GetRecentSuccess.get(data);
           }
           GlobalModalSetup.getGlobalModalHolder().alertMessage(
             'Thông báo',
@@ -219,7 +236,11 @@ const getFollowPost$ = (action$: Observable<PlainAction>) =>
       }).pipe(
         map((value) => {
           if ((value as any).status === 200) {
-            return GetFollowPostSuccess.get((value as any).data);
+            const data = {
+              posts: (value as any).data.posts,
+              page: action.payload?.page || 1
+            }
+            return GetFollowPostSuccess.get(data);
           }
           GlobalModalSetup.getGlobalModalHolder().alertMessage(
             'Thông báo',
@@ -378,11 +399,13 @@ const getDetailNotNav$ = (action$: Observable<PlainAction>) =>
       LikePostSuccess.type,
     ),
     exhaustMap((action: any) => {
+      GlobalLoadingSetup.getLoading().isVisible();
       return request<any>({
         method: 'GET',
         url: `post/getPost/${action.payload.postId}`,
       }).pipe(
         map((value) => {
+          GlobalLoadingSetup.getLoading().isHide();
           if ((value as any).status === 200) {
             return GetDetailPostSuccessNotNav.get((value as any).data);
           }
@@ -393,6 +416,7 @@ const getDetailNotNav$ = (action$: Observable<PlainAction>) =>
           return GetDetailPostFailed.get(value.data);
         }),
         catchError((error) => {
+          GlobalLoadingSetup.getLoading().isHide();
           GlobalModalSetup.getGlobalModalHolder().alertMessage(
             'Thông báo',
             (error as any).data?.message,
@@ -590,6 +614,7 @@ const commentPost$ = (action$: Observable<PlainAction>) =>
   action$.pipe(
     ofType(CommentPost.type),
     exhaustMap((action: any) => {
+      GlobalLoadingSetup.getLoading().isVisible();
       return request<any>({
         method: 'POST',
         url: 'user/comment',
@@ -599,8 +624,11 @@ const commentPost$ = (action$: Observable<PlainAction>) =>
         },
       }).pipe(
         map((value) => {
+          GlobalLoadingSetup.getLoading().isHide();
           if ((value as any).status === 200) {
-            store.dispatch(GetDetailPost.get({postId: action.payload.postId}));
+            store.dispatch(
+              GetDetailPostNotNav.get({postId: action.payload.postId}),
+            );
             return CommentPostSuccess.get(action.payload);
           }
           GlobalModalSetup.getGlobalModalHolder().alertMessage(
@@ -610,11 +638,51 @@ const commentPost$ = (action$: Observable<PlainAction>) =>
           return CommentPostFailed.get(value.data);
         }),
         catchError((error) => {
+          GlobalLoadingSetup.getLoading().isHide();
           GlobalModalSetup.getGlobalModalHolder().alertMessage(
             'Thông báo',
             (error as any).data?.message,
           );
           return of(CommentPostFailed.get(error.data));
+        }),
+      );
+    }),
+  );
+
+const deleteComment$ = (action$: Observable<PlainAction>) =>
+  action$.pipe(
+    ofType(DeleteComment.type),
+    exhaustMap((action: any) => {
+      GlobalLoadingSetup.getLoading().isVisible();
+      return request<any>({
+        method: 'POST',
+        url: 'user/deletecomment',
+        param: action.payload.data,
+        option: {
+          format: 'json',
+        },
+      }).pipe(
+        map((value) => {
+          GlobalLoadingSetup.getLoading().isHide();
+          if ((value as any).status === 200) {
+            store.dispatch(
+              GetDetailPostNotNav.get({postId: action.payload.postId}),
+            );
+            return DeleteCommentSuccess.get(action.payload);
+          }
+          GlobalModalSetup.getGlobalModalHolder().alertMessage(
+            'Thông báo',
+            (value as any).data?.message,
+          );
+          return DeleteCommentFailed.get(value.data);
+        }),
+        catchError((error) => {
+          GlobalLoadingSetup.getLoading().isHide();
+          GlobalModalSetup.getGlobalModalHolder().alertMessage(
+            'Thông báo',
+            (error as any).data?.message,
+          );
+          return of(DeleteCommentFailed.get(error.data));
         }),
       );
     }),
@@ -646,11 +714,69 @@ const createRecipeEpic$ = (action$: Observable<PlainAction>) =>
     }),
   );
 
+const updateRecipeEpic$ = (action$: Observable<PlainAction>) =>
+  action$.pipe(
+    ofType(UpdateRecipe.type),
+    exhaustMap((action: any) => {
+      GlobalLoadingSetup.getLoading().isVisible();
+      return request<any>({
+        method: 'PUT',
+        url: `post/update/${action.payload.id}`,
+        param: action.payload.data,
+        option: {
+          format: 'json',
+        },
+      }).pipe(
+        map((result) => {
+          GlobalLoadingSetup.getLoading().isHide();
+          if ((result as any).status === 200) {
+            store.dispatch(GetProfile.get(store.getState().Auth.user.username));
+            return UpdateRecipeSuccess.get(result.data);
+          }
+          return UpdateRecipeFailed.get(result);
+        }),
+        catchError((error) => {
+          GlobalLoadingSetup.getLoading().isHide();
+          return UpdateRecipeFailed.get(error);
+        }),
+      );
+    }),
+  );
+
 const createPostSuccess$ = (action$: Observable<PlainAction>) =>
   action$.pipe(
-    ofType(CreateRecipeSuccess.type),
+    ofType(CreateRecipeSuccess.type, UpdateRecipeSuccess.type),
     map(() => {
-      return store.dispatch(NavigationActions.back());
+      return store.dispatch(StackActions.pop());
+    }),
+  );
+
+const deleteRecipeEpic$ = (action$: Observable<PlainAction>) =>
+  action$.pipe(
+    ofType(DeleteRecipe.type),
+    exhaustMap((action: any) => {
+      GlobalLoadingSetup.getLoading().isVisible();
+      return request<any>({
+        method: 'POST',
+        url: 'post/remove',
+        param: action.payload,
+        option: {
+          format: 'json',
+        },
+      }).pipe(
+        map((result) => {
+          GlobalLoadingSetup.getLoading().isHide();
+          if ((result as any).status === 200) {
+            store.dispatch(GetProfile.get(store.getState().Auth.user.username));
+            return DeleteRecipeSuccess.get(result.data);
+          }
+          return DeleteRecipeFailed.get(result);
+        }),
+        catchError((error) => {
+          GlobalLoadingSetup.getLoading().isHide();
+          return DeleteRecipeFailed.get(error);
+        }),
+      );
     }),
   );
 
@@ -747,4 +873,7 @@ export const profileEpics = combineEpics(
   createPostSuccess$,
   getAnotherProfileRequest$,
   getUserPost$,
+  updateRecipeEpic$,
+  deleteRecipeEpic$,
+  deleteComment$,
 );

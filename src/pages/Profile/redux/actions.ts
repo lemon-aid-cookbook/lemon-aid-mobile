@@ -75,6 +75,14 @@ export const CreateRecipe = defineAction<any>('CREATE_RECIPE');
 export const CreateRecipeSuccess = defineAction<any>('CREATE_RECIPE_SUCCESS');
 export const CreateRecipeFailed = defineAction<any>('CREATE_RECIPE_FAILED');
 
+export const UpdateRecipe = defineAction<any>('UPDATE_RECIPE');
+export const UpdateRecipeSuccess = defineAction<any>('UPDATE_RECIPE_SUCCESS');
+export const UpdateRecipeFailed = defineAction<any>('UPDATE_RECIPE_FAILED');
+
+export const DeleteRecipe = defineAction<any>('DELETE_RECIPE');
+export const DeleteRecipeSuccess = defineAction<any>('DELETE_RECIPE_SUCCESS');
+export const DeleteRecipeFailed = defineAction<any>('DELETE_RECIPE_FAILED');
+
 export const ChangePassword = defineAction<any>('CHANGE_PASSWORD');
 export const ChangePasswordSuccess = defineAction<any>(
   'CHANGE_PASSWORD_SUCCESS',

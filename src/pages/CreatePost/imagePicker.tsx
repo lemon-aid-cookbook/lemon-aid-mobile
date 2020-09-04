@@ -1,5 +1,5 @@
 import {COLOR, ratio} from 'config/themeUtils';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Image, StyleSheet, View} from 'react-native';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import ImagePicker from 'react-native-image-picker';
@@ -10,6 +10,7 @@ import {useDispatch} from 'react-redux';
 export interface Props {
   type: 'BIG' | 'SMALL';
   onChange: (data: any) => void;
+  src?: string;
 }
 
 const defaultProps = {};
@@ -18,6 +19,12 @@ const ImageUpload: React.FC<Props> = (props) => {
   const {goBack, navigate} = useNavigation();
   const dispatch = useDispatch();
   const [image, setImage] = useState('');
+
+  useEffect(() => {
+    if (props.src) {
+      setImage(props.src);
+    }
+  }, []);
 
   const insertThubnail = () => {
     ImagePicker.showImagePicker(

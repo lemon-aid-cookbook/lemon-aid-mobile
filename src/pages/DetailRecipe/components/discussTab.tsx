@@ -1,17 +1,11 @@
-import {CHeader, CText, CInput} from 'components';
-import {COLOR, HEADER_TYPE, ratio} from 'config/themeUtils';
+import {CInput, CText, GlobalModalSetup} from 'components';
+import {COLOR, MODAL_TYPE, ratio} from 'config/themeUtils';
+import {CommentPost, DeleteComment} from 'pages/Profile/redux/actions';
 import React, {useState} from 'react';
-import {
-  Image,
-  ScrollView,
-  StyleSheet,
-  TouchableWithoutFeedback,
-  View,
-} from 'react-native';
-import {TouchableOpacity, FlatList} from 'react-native-gesture-handler';
+import {Image, StyleSheet, View} from 'react-native';
+import {FlatList, TouchableOpacity} from 'react-native-gesture-handler';
 import {useNavigation} from 'react-navigation-hooks';
-import { useSelector, useDispatch } from 'react-redux';
-import { CommentPost } from 'pages/Profile/redux/actions';
+import {useDispatch, useSelector} from 'react-redux';
 export interface Props {
   listCmt: any[];
 }
@@ -23,14 +17,16 @@ const defaultProps = {
       userId: 3,
       name: 'Trang nè',
       ava: 'https://source.unsplash.com/random',
-      cmt: 'Khó quá à \n Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,',
+      cmt:
+        'Khó quá à \n Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,',
     },
     {
       id: 0,
       userId: 3,
       name: 'Trang nè',
       ava: 'https://source.unsplash.com/random',
-      cmt: 'Khó quá à \n Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,',
+      cmt:
+        'Khó quá à \n Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,',
     },
   ],
 };
@@ -43,7 +39,7 @@ const DiscussTab: React.FC<Props> = (props) => {
   const profile = useSelector((state) => state.Profile);
   const {profileInfo, detailPost} = profile;
   const dispatch = useDispatch();
-  const [reply, setReply] = useState(-1)
+  const [reply, setReply] = useState(-1);
 
   const renderDiscussInput = () => {
     return (
@@ -84,21 +80,21 @@ const DiscussTab: React.FC<Props> = (props) => {
                   postId: detailPost.id,
                   userId: user.id,
                   parentCommentId: null,
-                  message: cmt
-                })
-              )
-              setCmt('')
+                  message: cmt,
+                }),
+              );
+              setCmt('');
             }}
-            onSubmitEditing={() =>  {
+            onSubmitEditing={() => {
               dispatch(
                 CommentPost.get({
                   postId: detailPost.id,
                   userId: user.id,
                   parentCommentId: null,
-                  message: cmt
-                })
-              )
-              setCmt('')
+                  message: cmt,
+                }),
+              );
+              setCmt('');
             }}
           />
         </View>
@@ -110,30 +106,51 @@ const DiscussTab: React.FC<Props> = (props) => {
     return (
       <View>
         <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'flex-start',
-          marginVertical: 4 * ratio,
-          paddingHorizontal: 16 * ratio
-        }}
-        key={index}>
-        <Image
-          source={{
-            uri: item.User?.avatar,
+          style={{
+            flexDirection: 'row',
+            alignItems: 'flex-start',
+            marginVertical: 4 * ratio,
+            paddingHorizontal: 16 * ratio,
           }}
-          style={styles.avaWrap}
-        />
-        <View style={{flex: 1}}>
-          <CText fontSize={14} bold>
-            {item.User?.username}
-          </CText>
-          <View style={{flex: 1, flexDirection: 'row', flexWrap: 'wrap'}}>
-            <CText fontSize={14} style={{flex: 1, textAlign: 'justify'}}>
-              {item.message}
+          key={index}>
+          <Image
+            source={{
+              uri: item.User?.avatar,
+            }}
+            style={styles.avaWrap}
+          />
+          <View style={{flex: 1}}>
+            <CText fontSize={14} bold>
+              {item.User?.username}
             </CText>
+            <View style={{flex: 1, flexDirection: 'row', flexWrap: 'wrap'}}>
+              <CText fontSize={14} style={{flex: 1, textAlign: 'justify'}}>
+                {item.message}
+              </CText>
+            </View>
+            {user.id === item.userId && (
+              <TouchableOpacity
+                onPress={() =>
+                  GlobalModalSetup.getGlobalModalHolder().alertMessage(
+                    'Xác nhận',
+                    'Bạn chắc chắn muốn xóa thảo luận này?',
+                    MODAL_TYPE.CHOICE,
+                    () =>
+                      dispatch(
+                        DeleteComment.get({
+                          data: {commentId: item.id},
+                          postId: detailPost.id,
+                        }),
+                      ),
+                  )
+                }>
+                <CText fontSize={14} color={COLOR.PRIMARY_ACTIVE}>
+                  Xóa
+                </CText>
+              </TouchableOpacity>
+            )}
           </View>
         </View>
-      </View>
       </View>
     );
   };
@@ -142,54 +159,81 @@ const DiscussTab: React.FC<Props> = (props) => {
     return (
       <View>
         <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'flex-start',
-          marginVertical: 4 * ratio,
-          paddingHorizontal: 16 * ratio
-        }}
-        key={index}>
-        <Image
-          source={{
-            uri: item.User?.avatar,
+          style={{
+            flexDirection: 'row',
+            alignItems: 'flex-start',
+            marginVertical: 4 * ratio,
+            paddingHorizontal: 16 * ratio,
           }}
-          style={styles.avaWrap}
-        />
-        <View style={{flex: 1}}>
-          <CText fontSize={14} bold>
-            {item.User?.username}
-          </CText>
-          <View style={{flex: 1, flexDirection: 'row', flexWrap: 'wrap'}}>
-            <CText fontSize={14} style={{flex: 1, textAlign: 'justify'}}>
-              {item.message}
+          key={index}>
+          <Image
+            source={{
+              uri: item.User?.avatar,
+            }}
+            style={styles.avaWrap}
+          />
+          <View style={{flex: 1}}>
+            <CText fontSize={14} bold>
+              {item.User?.username}
             </CText>
+            <View style={{flex: 1, flexDirection: 'row', flexWrap: 'wrap'}}>
+              <CText fontSize={14} style={{flex: 1, textAlign: 'justify'}}>
+                {item.message}
+              </CText>
+            </View>
+            <View style={{flexDirection: 'row'}}>
+              <TouchableOpacity
+                onPress={() => setReply(reply === index ? -1 : index)}>
+                <CText fontSize={14} color={COLOR.PRIMARY_ACTIVE}>
+                  Trả lời
+                </CText>
+              </TouchableOpacity>
+              {user.id === item.userId && (
+                <TouchableOpacity
+                  style={{marginLeft: 20 * ratio}}
+                  onPress={() =>
+                    GlobalModalSetup.getGlobalModalHolder().alertMessage(
+                      'Xác nhận',
+                      'Bạn chắc chắn muốn xóa thảo luận này?',
+                      MODAL_TYPE.CHOICE,
+                      () =>
+                        dispatch(
+                          DeleteComment.get({
+                            data: {commentId: item.id},
+                            postId: detailPost.id,
+                          }),
+                        ),
+                    )
+                  }>
+                  <CText fontSize={14} color={COLOR.PRIMARY_ACTIVE}>
+                    Xóa
+                  </CText>
+                </TouchableOpacity>
+              )}
+            </View>
+            {reply === index && renderReplyInput(item)}
           </View>
-          <TouchableOpacity onPress={() => setReply(reply === index ? -1 : index)}>
-          <CText fontSize={14} color={COLOR.PRIMARY_ACTIVE}>Trả lời</CText>
-          </TouchableOpacity>
-          {reply === index && renderReplyInput(item)}
         </View>
-      </View>
-      <View style={{ paddingLeft: 36 * ratio}}>
-      <FlatList
-      showsVerticalScrollIndicator={false}
-          data={item.SubComment}
-          keyExtractor={(index) => index.toString()}
-          renderItem={renderSubItem}
-          ItemSeparatorComponent={() => {
+        <View style={{paddingLeft: 36 * ratio}}>
+          <FlatList
+            showsVerticalScrollIndicator={false}
+            data={item.SubComment}
+            keyExtractor={(index) => index.toString()}
+            renderItem={renderSubItem}
+            ItemSeparatorComponent={() => {
               return (
                 <View
-                style={{
-                  backgroundColor: COLOR.LIGHT_GRAY,
-                  height: 1 * ratio,
-                  width: '100%',
-                  marginVertical: 9 * ratio,
-                }}
-              />
-              )
-          }}
-        />
-      </View>
+                  style={{
+                    backgroundColor: COLOR.LIGHT_GRAY,
+                    height: 1 * ratio,
+                    width: '100%',
+                    marginVertical: 9 * ratio,
+                  }}
+                />
+              );
+            }}
+          />
+        </View>
       </View>
     );
   };
@@ -212,7 +256,7 @@ const DiscussTab: React.FC<Props> = (props) => {
           />
           <CInput
             containerStyle={{flex: 1, justifyContent: 'center'}}
-            style={[styles.inputWrap, { width: '100%'}]}
+            style={[styles.inputWrap, {width: '100%'}]}
             // multiline
             textSize={14}
             placeholder={'Nhập thảo luận...'}
@@ -233,10 +277,10 @@ const DiscussTab: React.FC<Props> = (props) => {
                   postId: detailPost.id,
                   userId: user.id,
                   parentCommentId: item.id,
-                  message: replyCmt
-                })
-              )
-              setReplyCmt('')
+                  message: replyCmt,
+                }),
+              );
+              setReplyCmt('');
             }}
             onSubmitEditing={() => {
               dispatch(
@@ -244,28 +288,28 @@ const DiscussTab: React.FC<Props> = (props) => {
                   postId: detailPost.id,
                   userId: user.id,
                   parentCommentId: item.id,
-                  message: replyCmt
-                })
-              )
-              setReplyCmt('')
+                  message: replyCmt,
+                }),
+              );
+              setReplyCmt('');
             }}
           />
         </View>
       </View>
     );
-  }
+  };
 
   const renderComment = () => {
     return (
-      <View style={{ flex: 1}}>
+      <View style={{flex: 1}}>
         <FlatList
-        showsVerticalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
           data={detailPost.Comments}
           keyExtractor={(index) => index.toString()}
           renderItem={renderItem}
           ItemSeparatorComponent={() => {
-              return (
-                <View
+            return (
+              <View
                 style={{
                   backgroundColor: COLOR.LIGHT_GRAY,
                   height: 1 * ratio,
@@ -273,7 +317,7 @@ const DiscussTab: React.FC<Props> = (props) => {
                   marginVertical: 9 * ratio,
                 }}
               />
-              )
+            );
           }}
         />
       </View>
@@ -281,16 +325,18 @@ const DiscussTab: React.FC<Props> = (props) => {
   };
   return (
     <View style={styles.container}>
-        {user && renderDiscussInput()}
-        {user && <View
+      {user && renderDiscussInput()}
+      {user && (
+        <View
           style={{
             backgroundColor: COLOR.LIGHT_GRAY,
             height: 8 * ratio,
             width: '100%',
             marginVertical: 9 * ratio,
           }}
-        />}
-        {renderComment()}
+        />
+      )}
+      {renderComment()}
     </View>
   );
 };
@@ -305,7 +351,7 @@ const styles = StyleSheet.create({
   listWrap: {
     flex: 1,
     backgroundColor: 'white',
-    paddingTop: 16 * ratio
+    paddingTop: 16 * ratio,
   },
   avaWrap: {
     width: 40 * ratio,

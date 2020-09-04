@@ -4,9 +4,9 @@ import {FlatList, TouchableOpacity, View, StyleSheet} from 'react-native';
 import {useNavigation} from 'react-navigation-hooks';
 import {useDispatch, useSelector} from 'react-redux';
 import RecipeItem from 'pages/Search/components/recipeItem';
-import { ratio } from 'config/themeUtils';
+import { ratio, TAB_TYPES } from 'config/themeUtils';
 import EmptyList from './emptyList';
-import { GetDetailPost } from 'pages/Profile/redux/actions';
+import { GetDetailPost, GetMostFave } from 'pages/Profile/redux/actions';
 
 export interface Props {
 
@@ -17,6 +17,7 @@ const MostFavTab: React.FC<Props> = (props) => {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.Auth.user);
   const mostFavPost = useSelector((state) => state.Profile.mostFavPost);
+  const mostFavPage = useSelector((state) => state.Profile.mostFavPage);
 
   const _renderItem = ({item, index}: {item: any; index: string}) => {
     return (
@@ -32,6 +33,14 @@ const MostFavTab: React.FC<Props> = (props) => {
     );
   };
 
+  const handleLoadMore = () => {
+    dispatch(
+      GetMostFave.get({
+        page: mostFavPage + 1,
+      }),
+    );
+  }
+
   return (
     <FlatList
       data={mostFavPost}
@@ -39,6 +48,8 @@ const MostFavTab: React.FC<Props> = (props) => {
       renderItem={_renderItem}
       showsVerticalScrollIndicator={false}
       ListEmptyComponent={() => <EmptyList />}
+      onEndReachedThreshold={0.4}
+      onEndReached={handleLoadMore}
     />
   );
 };
