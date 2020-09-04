@@ -1,12 +1,12 @@
 import {CText, CButton} from 'components';
-import React from 'react';
+import React, { useEffect } from 'react';
 import {FlatList, TouchableOpacity, View, StyleSheet} from 'react-native';
 import {useNavigation} from 'react-navigation-hooks';
 import {useDispatch, useSelector} from 'react-redux';
 import RecipeItem from 'pages/Search/components/recipeItem';
-import { ratio } from 'config/themeUtils';
+import { ratio, TAB_TYPES } from 'config/themeUtils';
 import EmptyList from './emptyList';
-import { GetDetailPost } from 'pages/Profile/redux/actions';
+import { GetDetailPost, GetFollowPost } from 'pages/Profile/redux/actions';
 
 export interface Props {
 
@@ -17,6 +17,8 @@ const FollowTab: React.FC<Props> = (props) => {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.Auth.user);
   const followPost = useSelector((state) => state.Profile.followPost);
+  const followPostPage = useSelector((state) => state.Profile.followPostPage);
+  const totalFollowPost = useSelector((state) => state.Profile.totalFollowPost);
 
   const _renderItem = ({item, index}: {item: any; index: string}) => {
     return (
@@ -47,6 +49,19 @@ const FollowTab: React.FC<Props> = (props) => {
     );
   }
 
+  const handleLoadMore = () => {
+    if ( followPost.length < totalFollowPost) {
+      dispatch(
+        GetFollowPost.get({
+          userId: user.id,
+          limit: 10,
+          page: followPostPage + 1,
+          type: TAB_TYPES[2],
+        }),
+      );
+    }
+  }
+
   return (
     <FlatList
       data={followPost}
@@ -54,6 +69,8 @@ const FollowTab: React.FC<Props> = (props) => {
       renderItem={_renderItem}
       showsVerticalScrollIndicator={false}
       ListEmptyComponent={() => <EmptyList />}
+      onEndReachedThreshold={0.4}
+      onEndReached={handleLoadMore}
     />
   );
 };

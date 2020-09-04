@@ -51,6 +51,8 @@ const FavoritePage: React.FC<Props> = (props) => {
   const {goBack, navigate} = useNavigation();
   const user = useSelector((state) => state.Auth.user);
   const favPost = useSelector((state) => state.Profile.favPost);
+  const totalFavoritePost = useSelector((state) => state.Profile.totalFavoritePost);
+  const favPage = useSelector((state) => state.Profile.favPage);
   const dispatch = useDispatch();
   
   useEffect(() => {
@@ -100,6 +102,19 @@ const FavoritePage: React.FC<Props> = (props) => {
     );
   }
 
+  const handleLoadMore = () => {
+    if ( favPost.length < totalFavoritePost) {
+      dispatch(
+        dispatch(GetFavoritePost.get({
+          userId: user.id,
+          limit: 10,
+          page: favPage,
+          type: TAB_TYPES[1]
+        }))
+      );
+    }
+  }
+
   return (
     <View style={styles.container}>
       <CHeader type={HEADER_TYPE.NORMAL} headerTitle={'Yêu thích'} />
@@ -109,6 +124,8 @@ const FavoritePage: React.FC<Props> = (props) => {
           keyExtractor={(index) => index.toString()}
           renderItem={_renderItem}
           showsVerticalScrollIndicator={false}
+          onEndReachedThreshold={0.4}
+          onEndReached={handleLoadMore}
         />
       </View>
     </View>

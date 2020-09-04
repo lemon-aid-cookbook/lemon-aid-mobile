@@ -73,6 +73,7 @@ import {
   DeleteCommentSuccess,
   DeleteCommentFailed,
 } from './actions';
+import { act } from 'react-test-renderer';
 
 const getProfileRequest$ = (action$: Observable<PlainAction>) =>
   action$.pipe(
@@ -94,6 +95,23 @@ const getProfileRequest$ = (action$: Observable<PlainAction>) =>
                 type: TAB_TYPES[0],
               }),
             );
+            store.dispatch(
+              GetFollowPost.get({
+                userId: (value as any).data.userData.id,
+                limit: 10,
+                page: 1,
+                type: TAB_TYPES[2],
+              }),
+            );
+            store.dispatch(
+              GetFavoritePost.get({
+                userId: (value as any).data.userData.id,
+                limit: 10,
+                page: 1,
+                type: TAB_TYPES[1],
+              }),
+            );
+            
             return GetProfileSuccess.get((value as any).data.userData);
           }
           GlobalModalSetup.getGlobalModalHolder().alertMessage(
@@ -158,18 +176,17 @@ const getMostFavRequest$ = (action$: Observable<PlainAction>) =>
   action$.pipe(
     ofType(GetMostFave.type, UnlikePostSuccess.type, LikePostSuccess.type),
     exhaustMap((action: any) => {
-      GlobalLoadingSetup.getLoading().isVisible();
       return request<any>({
         method: 'GET',
         url: 'post/search',
         param: {sort: 'common', limit: 10, page: action.payload?.page || 1},
       }).pipe(
         map((value) => {
-          GlobalLoadingSetup.getLoading().isHide();
           if ((value as any).status === 200) {
             const data = {
               posts: (value as any).data.posts,
-              page: action.payload?.page || 1
+              page: action.payload?.page || 1,
+              numberOfPosts: (value as any).data.numberOfPosts
             }
             return GetMostFaveSuccess.get(data);
           }
@@ -180,7 +197,6 @@ const getMostFavRequest$ = (action$: Observable<PlainAction>) =>
           return GetMostFaveFailed.get(value.data);
         }),
         catchError((error) => {
-          GlobalLoadingSetup.getLoading().isHide();
           GlobalModalSetup.getGlobalModalHolder().alertMessage(
             'Thông báo',
             (error as any).data?.message,
@@ -204,7 +220,8 @@ const getRecent$ = (action$: Observable<PlainAction>) =>
           if ((value as any).status === 200) {
             const data = {
               posts: (value as any).data.posts,
-              page: action.payload?.page || 1
+              page: action.payload?.page || 1,
+              numberOfPosts: (value as any).data.numberOfPosts
             }
             return GetRecentSuccess.get(data);
           }
@@ -238,7 +255,8 @@ const getFollowPost$ = (action$: Observable<PlainAction>) =>
           if ((value as any).status === 200) {
             const data = {
               posts: (value as any).data.posts,
-              page: action.payload?.page || 1
+              page: action.payload?.page || 1,
+              numberOfPosts: (value as any).data.totalItems
             }
             return GetFollowPostSuccess.get(data);
           }
@@ -275,7 +293,12 @@ const getFollowPostFav$ = (action$: Observable<PlainAction>) =>
       }).pipe(
         map((value) => {
           if ((value as any).status === 200) {
-            return GetFollowPostSuccess.get((value as any).data);
+            const data = {
+              posts: (value as any).data.posts,
+              page: action.payload?.page || 1,
+              numberOfPosts: (value as any).data.totalItems
+            }
+            return GetFollowPostSuccess.get(data);
           }
           GlobalModalSetup.getGlobalModalHolder().alertMessage(
             'Thông báo',
@@ -305,7 +328,12 @@ const getFavoritePost$ = (action$: Observable<PlainAction>) =>
       }).pipe(
         map((value) => {
           if ((value as any).status === 200) {
-            return GetFavoritePostSuccess.get((value as any).data);
+            const val = {
+              posts: (value as any).data.posts,
+              totalItems: (value as any).data.totalItems,
+              page: action.payload.page,
+            };
+            return GetFavoritePostSuccess.get(val);
           }
           GlobalModalSetup.getGlobalModalHolder().alertMessage(
             'Thông báo',
@@ -830,7 +858,14 @@ const getSearchPost$ = (action$: Observable<PlainAction>) =>
         map((value) => {
           GlobalLoadingSetup.getLoading().isHide();
           if ((value as any).status === 200) {
-            return SearchRecipesSuccess.get((value as any).data);
+            const data = {
+              search: action.payload.search || '',
+              isFilter: action.payload.isFilter || false,
+              page: action.payload.page || 1,
+              posts: value.data.posts,
+              numberOfPosts: value.data.numberOfPosts
+            }
+            return SearchRecipesSuccess.get(data);
           }
           GlobalModalSetup.getGlobalModalHolder().alertMessage(
             'Thông báo',

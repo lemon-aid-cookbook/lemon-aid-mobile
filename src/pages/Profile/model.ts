@@ -11,4 +11,11 @@ export interface ProfileState {
   totalUserPost: number;
   totalItems: number;
   userPage: number;
+  keyword: string;
+  totalMostFavPost: number;
+  totalFollowPost: number;
+  totalRecentPost: number;
+  category: string;
+  isFilter: boolean;
+  totalFavoritePost: number;
 }

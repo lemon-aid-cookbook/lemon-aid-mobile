@@ -60,13 +60,15 @@ class Header extends React.Component<Props, State, {}> {
               textSize={16}
               placeholder={'Tên món ăn...'}
               value={this.state.searchValue}
-              onChangeText={(text: string) => { this.setState({ searchValue: text})}}>
-            </CInput>
-            <TouchableOpacity
-              onPress={() => {
+              onChangeText={(text: string) => { this.setState({ searchValue: text})}}
+              onSubmitEditing={() => {
                 this.props.onSearch(this.state.searchValue);
-              }}>
-              <Feather name={'search'} size={24} color={'white'} />
+              }}
+              returnKeyType={'search'}>
+            </CInput>
+            <TouchableOpacity activeOpacity={1}
+                onPress={this.props.onRightPress}>
+              <Feather name={'filter'} size={24} color={'white'} />
             </TouchableOpacity>
           </View>
         </View>
