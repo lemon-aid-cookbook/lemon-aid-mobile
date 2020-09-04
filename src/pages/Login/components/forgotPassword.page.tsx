@@ -13,6 +13,7 @@ import Feather from 'react-native-vector-icons/Feather';
 import {useNavigation} from 'react-navigation-hooks';
 import {useDispatch} from 'react-redux';
 import * as yup from 'yup';
+import {ForgotPassword} from '../redux/actions';
 
 export interface Props {}
 
@@ -48,7 +49,9 @@ const ForgotPasswordPage: React.FC<Props> = (props) => {
           initialValues={{email: ''}}
           isInitialValid={false}
           validationSchema={validationSchema}
-          onSubmit={(values) => console.log(values)}>
+          onSubmit={(values: any) =>
+            dispatch(ForgotPassword.get({email: values.email.toLowerCase()}))
+          }>
           {({
             handleChange,
             handleBlur,

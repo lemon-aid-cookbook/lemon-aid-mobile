@@ -3,7 +3,6 @@ import {COLOR, ratio} from 'config/themeUtils';
 import {Formik} from 'formik';
 import React from 'react';
 import {
-  Image,
   ScrollView,
   StatusBar,
   StyleSheet,
@@ -134,7 +133,7 @@ const LoginPage: React.FC<Props> = (props) => {
                   onPress={handleSubmit}
                 />
 
-                <View style={styles.addButton}>
+                {/* <View style={styles.addButton}>
                   <CText fontSize={18 * ratio}>Đăng nhập bằng</CText>
                   <TouchableOpacity onPress={() => {}}>
                     <Image
@@ -142,7 +141,7 @@ const LoginPage: React.FC<Props> = (props) => {
                       style={{width: 92, height: 64}}
                     />
                   </TouchableOpacity>
-                </View>
+                </View> */}
               </View>
             );
           }}
