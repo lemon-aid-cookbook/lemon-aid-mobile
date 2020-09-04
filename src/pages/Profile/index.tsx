@@ -1,5 +1,11 @@
-import {CHeader, CText, RoyalModal} from 'components';
-import {COLOR, HEADER_TYPE, ratio, TAB_TYPES} from 'config/themeUtils';
+import {CHeader, CText, GlobalModalSetup, RoyalModal} from 'components';
+import {
+  COLOR,
+  HEADER_TYPE,
+  MODAL_TYPE,
+  ratio,
+  TAB_TYPES,
+} from 'config/themeUtils';
 import {SignoutRequest} from 'pages/Login/redux/actions';
 import EmptyList from 'pages/Search/components/emptyList';
 import RecipeItem from 'pages/Search/components/recipeItem';
@@ -14,13 +20,14 @@ import {
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import ImagePicker from 'react-native-image-picker';
 import Feather from 'react-native-vector-icons/Feather';
-import {useNavigation, useIsFocused} from 'react-navigation-hooks';
+import {useIsFocused, useNavigation} from 'react-navigation-hooks';
 import {useDispatch, useSelector} from 'react-redux';
 import {
+  DeleteRecipe,
   GetDetailPost,
   GetProfile,
-  UpdateInfo,
   GetUserPost,
+  UpdateInfo,
 } from './redux/actions';
 
 export interface Props {
@@ -78,7 +85,7 @@ const ProfilePage: React.FC<Props> = (props) => {
   const [refreshing, setRefreshing] = useState(false);
   const isFocused = useIsFocused();
   const [isShowModal, setShowModal] = useState(false);
-  const [detailItem, setDetailItem] = useState({})
+  const [detailItem, setDetailItem] = useState({});
 
   useEffect(() => {
     if (user && isFocused) {
@@ -99,7 +106,7 @@ const ProfilePage: React.FC<Props> = (props) => {
         style={{flex: 1}}
         onLongPress={() => {
           setDetailItem(item);
-          setShowModal(true)
+          setShowModal(true);
         }}>
         <RecipeItem item={recipe} />
       </TouchableOpacity>
@@ -201,6 +208,7 @@ const ProfilePage: React.FC<Props> = (props) => {
             flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'space-around',
+            marginBottom: 16 * ratio,
           }}>
           <View style={styles.flView}>
             <CText bold fontSize={18}>
@@ -227,7 +235,7 @@ const ProfilePage: React.FC<Props> = (props) => {
             <CText>đang theo dõi</CText>
           </TouchableOpacity>
         </View>
-        <CText
+        {/* <CText
           bold
           fontSize={22}
           style={{
@@ -236,7 +244,7 @@ const ProfilePage: React.FC<Props> = (props) => {
             paddingLeft: 24 * ratio,
           }}>
           Công thức của bạn
-        </CText>
+        </CText> */}
         <FlatList
           data={userPost}
           keyExtractor={(item, index) => item.id}
@@ -255,9 +263,18 @@ const ProfilePage: React.FC<Props> = (props) => {
         isShow={isShowModal}
         onCancel={(val) => setShowModal(val)}
         onDelete={(value) => {
-          console.info('delete');
+          setShowModal(value.isVisible);
+          GlobalModalSetup.getGlobalModalHolder().alertMessage(
+            'Xác nhận',
+            `Bạn có chắc chắn muốn xóa công thức ${value.item.title}?`,
+            MODAL_TYPE.CHOICE,
+            () => dispatch(DeleteRecipe.get({id: value.item.id})),
+          );
         }}
-        onEdit={(val) => console.info('edit', val.item)}
+        onEdit={(val) => {
+          setShowModal(val.isVisible);
+          navigate('UpdatePost', {id: val.item.id});
+        }}
       />
     </View>
   );

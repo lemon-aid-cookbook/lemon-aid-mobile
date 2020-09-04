@@ -1,16 +1,14 @@
-import { CHeader } from 'components';
-import { HEADER_TYPE, ratio } from 'config/themeUtils';
-import { ClearSearch, GetDetailPost, SearchRecipes } from 'pages/Profile/redux/actions';
-import React, { useEffect } from 'react';
+import {CHeader} from 'components';
+import {HEADER_TYPE, ratio} from 'config/themeUtils';
 import {
-    FlatList, StyleSheet,
-
-
-
-    TouchableOpacity, View
-} from 'react-native';
-import { useNavigation, useNavigationParam } from 'react-navigation-hooks';
-import { useDispatch, useSelector } from 'react-redux';
+  ClearSearch,
+  GetDetailPost,
+  SearchRecipes,
+} from 'pages/Profile/redux/actions';
+import React, {useEffect} from 'react';
+import {FlatList, StyleSheet, TouchableOpacity, View} from 'react-native';
+import {useNavigation, useNavigationParam} from 'react-navigation-hooks';
+import {useDispatch, useSelector} from 'react-redux';
 import EmptyList from './emptyList';
 import RecipeItem from './recipeItem';
 
@@ -24,16 +22,16 @@ const SearchDetailPage: React.FC<Props> = (props) => {
   const {goBack, navigate} = useNavigation();
 
   useEffect(() => {
-      if (keyword.length > 0) {
-        dispatch(
-            SearchRecipes.get({
-              order: 'latest',
-              limit: 10,
-              page: 1,
-              search: keyword,
-            }),
-          );
-      }
+    if (keyword.length > 0) {
+      dispatch(
+        SearchRecipes.get({
+          order: 'latest',
+          limit: 10,
+          page: 1,
+          search: keyword,
+        }),
+      );
+    }
 
     return () => dispatch(ClearSearch.get());
   }, []);
