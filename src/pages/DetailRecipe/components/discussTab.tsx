@@ -182,13 +182,13 @@ const DiscussTab: React.FC<Props> = (props) => {
               </CText>
             </View>
             <View style={{flexDirection: 'row'}}>
-              {user?.id === item.userId && <TouchableOpacity
+              {user && <TouchableOpacity
                 onPress={() => setReply(reply === index ? -1 : index)}>
                 <CText fontSize={14} color={COLOR.PRIMARY_ACTIVE}>
                   Trả lời
                 </CText>
               </TouchableOpacity>}
-              {user && (
+              {user?.id === item.userId && (
                 <TouchableOpacity
                   style={{marginLeft: 20 * ratio}}
                   onPress={() =>
