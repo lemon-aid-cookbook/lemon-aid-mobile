@@ -1,19 +1,24 @@
-import {PlainAction} from 'redux-typed-actions';
-import {ProfileState} from '../model';
+import { SignoutRequest } from 'pages/Login/redux/actions';
+import { PlainAction } from 'redux-typed-actions';
+import { ProfileState } from '../model';
 import {
-  GetProfileSuccess,
-  GetFavoritePostSuccess,
-  GetMostFaveSuccess,
-  GetRecentSuccess,
-  GetFollowPostSuccess,
-  GetDetailPostSuccess,
-  GetDetailPostSuccessNotNav,
-  SearchRecipesSuccess,
   ClearSearch,
-  GetAnotherProfileSuccess,
-  GetUserPostSuccess,
+  GetAnotherProfileSuccess, GetDetailPostSuccess,
+  GetDetailPostSuccessNotNav, GetFavoritePostSuccess,
+
+
+  GetFollowPostSuccess, GetMostFaveSuccess, GetProfileSuccess,
+
+
+  GetRecentSuccess,
+
+
+
+
+
+
+  GetUserPostSuccess, SearchRecipesSuccess
 } from './actions';
-import {SignoutRequest} from 'pages/Login/redux/actions';
 
 const initialState: ProfileState = {
   profileInfo: null,
@@ -36,21 +41,30 @@ export function profileReducer(
 ) {
   switch (action.type) {
     case GetProfileSuccess.type:
-      return {...state, profileInfo: action.payload};
+      return { ...state, profileInfo: action.payload };
 
     case GetAnotherProfileSuccess.type:
-      return {...state, anotherProfile: action.payload};
+      return { ...state, anotherProfile: action.payload };
 
     case GetFavoritePostSuccess.type:
-      return {...state, favPost: action.payload.posts};
+      return { ...state, favPost: action.payload.posts };
 
     case GetMostFaveSuccess.type:
-      return {...state, mostFavPost: action.payload.posts};
+      return {
+        ...state,
+        mostFavPage: action.payload?.page || 1,
+        mostFavPost: action.payload?.page === 1
+          ? action.payload.posts
+          : state.mostFavPost.concat(action.payload.posts),
+      };
 
     case GetRecentSuccess.type:
       return {
         ...state,
-        recentPost: action.payload.posts,
+        recentPage: action.payload?.page || 1,
+        recentPost: action.payload?.page === 1
+          ? action.payload.posts
+          : state.recentPost.concat(action.payload.posts),
       };
 
     case GetUserPostSuccess.type:
@@ -65,12 +79,16 @@ export function profileReducer(
       };
 
     case GetFollowPostSuccess.type:
-      return {...state, followPost: action.payload.posts};
+      return {
+        ...state, followPost: action.payload?.page === 1
+          ? action.payload.posts
+          : state.followPost.concat(action.payload.posts)
+      };
 
     case GetDetailPostSuccess.type:
-      return {...state, detailPost: action.payload.post};
+      return { ...state, detailPost: action.payload.post };
     case GetDetailPostSuccessNotNav.type:
-      return {...state, detailPost: action.payload.post};
+      return { ...state, detailPost: action.payload.post };
     case SignoutRequest.type:
       return {
         profileInfo: null,
