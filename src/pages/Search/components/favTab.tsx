@@ -18,6 +18,7 @@ const MostFavTab: React.FC<Props> = (props) => {
   const user = useSelector((state) => state.Auth.user);
   const mostFavPost = useSelector((state) => state.Profile.mostFavPost);
   const mostFavPage = useSelector((state) => state.Profile.mostFavPage);
+  const totalMostFavPost = useSelector((state) => state.Profile.totalMostFavPost);
 
   const _renderItem = ({item, index}: {item: any; index: string}) => {
     return (
@@ -34,11 +35,13 @@ const MostFavTab: React.FC<Props> = (props) => {
   };
 
   const handleLoadMore = () => {
-    dispatch(
-      GetMostFave.get({
-        page: mostFavPage + 1,
-      }),
-    );
+    if (mostFavPost.length < totalMostFavPost) {
+      dispatch(
+        GetMostFave.get({
+          page: mostFavPage + 1,
+        }),
+      );
+    }
   }
 
   return (

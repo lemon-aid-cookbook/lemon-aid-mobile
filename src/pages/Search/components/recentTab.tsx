@@ -18,6 +18,7 @@ const RecentTab: React.FC<Props> = (props) => {
   const user = useSelector((state) => state.Auth.user);
   const recentPost = useSelector((state) => state.Profile.recentPost);
   const recentPage = useSelector((state) => state.Profile.recentPage);
+  const totalRecentPost = useSelector((state) => state.Profile.totalRecentPost);
 
   const _renderItem = ({item, index}: {item: any; index: string}) => {
     return (
@@ -34,11 +35,13 @@ const RecentTab: React.FC<Props> = (props) => {
   };
 
   const handleLoadMore = () => {
+    if (recentPost.length < totalRecentPost) {
     dispatch(
       GetRecent.get({
         page: recentPage + 1,
       }),
     );
+    }
   }
 
   return (

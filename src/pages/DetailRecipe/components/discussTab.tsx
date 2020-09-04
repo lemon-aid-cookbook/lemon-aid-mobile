@@ -128,7 +128,7 @@ const DiscussTab: React.FC<Props> = (props) => {
                 {item.message}
               </CText>
             </View>
-            {user.id === item.userId && (
+            {user?.id === item.userId && (
               <TouchableOpacity
                 onPress={() =>
                   GlobalModalSetup.getGlobalModalHolder().alertMessage(
@@ -182,13 +182,13 @@ const DiscussTab: React.FC<Props> = (props) => {
               </CText>
             </View>
             <View style={{flexDirection: 'row'}}>
-              <TouchableOpacity
+              {user?.id === item.userId && <TouchableOpacity
                 onPress={() => setReply(reply === index ? -1 : index)}>
                 <CText fontSize={14} color={COLOR.PRIMARY_ACTIVE}>
                   Trả lời
                 </CText>
-              </TouchableOpacity>
-              {user.id === item.userId && (
+              </TouchableOpacity>}
+              {user && (
                 <TouchableOpacity
                   style={{marginLeft: 20 * ratio}}
                   onPress={() =>
