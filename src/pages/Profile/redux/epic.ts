@@ -162,12 +162,16 @@ const getMostFavRequest$ = (action$: Observable<PlainAction>) =>
       return request<any>({
         method: 'GET',
         url: 'post/search',
-        param: {sort: 'common', limit: 10, page: 1},
+        param: {sort: 'common', limit: 10, page: action.payload?.page || 1},
       }).pipe(
         map((value) => {
           GlobalLoadingSetup.getLoading().isHide();
           if ((value as any).status === 200) {
-            return GetMostFaveSuccess.get((value as any).data);
+            const data = {
+              posts: (value as any).data.posts,
+              page: action.payload?.page || 1
+            }
+            return GetMostFaveSuccess.get(data);
           }
           GlobalModalSetup.getGlobalModalHolder().alertMessage(
             'Thông báo',
@@ -194,11 +198,15 @@ const getRecent$ = (action$: Observable<PlainAction>) =>
       return request<any>({
         method: 'GET',
         url: 'post/search',
-        param: {sort: 'latest', limit: 10, page: 1},
+        param: {sort: 'latest', limit: 10, page: action.payload?.page || 1},
       }).pipe(
         map((value) => {
           if ((value as any).status === 200) {
-            return GetRecentSuccess.get((value as any).data);
+            const data = {
+              posts: (value as any).data.posts,
+              page: action.payload?.page || 1
+            }
+            return GetRecentSuccess.get(data);
           }
           GlobalModalSetup.getGlobalModalHolder().alertMessage(
             'Thông báo',
@@ -228,7 +236,11 @@ const getFollowPost$ = (action$: Observable<PlainAction>) =>
       }).pipe(
         map((value) => {
           if ((value as any).status === 200) {
-            return GetFollowPostSuccess.get((value as any).data);
+            const data = {
+              posts: (value as any).data.posts,
+              page: action.payload?.page || 1
+            }
+            return GetFollowPostSuccess.get(data);
           }
           GlobalModalSetup.getGlobalModalHolder().alertMessage(
             'Thông báo',
